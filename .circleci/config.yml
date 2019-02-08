@@ -10,6 +10,7 @@ jobs:
     steps:
       - checkout:
           path: ~/opwatch
+      - run: perl -0777 -i.orig -pe "s/MANUAL_BUILD/$(cat ../.version)/igs" build.gradle ../build.gradle
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
@@ -28,6 +29,7 @@ jobs:
             - Dockerfile
             - build/libs
             - build/resources
+            - ../.version
   test_server:
     docker:
       - image: circleci/openjdk:11-jdk
@@ -53,6 +55,22 @@ jobs:
           destination: build_reports
       - store_test_results:
           path: build/test-results
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - checkout:
+          path: ~/opwatch
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=$(cat .version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/build/libs/*.jar
+
+
+
 
 workflows:
   version: 2
@@ -62,9 +80,11 @@ workflows:
       - test_server:
           requires:
             - build_server
-      #- release_server:
-      #          requires:
-      #            - test_server
-      #          filters:
-      #            branches:
-      #              only: master
+      - publish-releases:
+          requires:
+            - test_server
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^\d+\.\d+\.\d+$/
