@@ -72,7 +72,7 @@ jobs:
           command: |
             VERSION=$(cat ~/opwatch/.version)
             echo $VERSION
-            zip ./artifacts/server-$(VERSION).zip ./artifacts/server ./.version
+            zip ./artifacts/server-$(VERSION).zip ./artifacts/server ./artifacts/.version
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
 
 
