@@ -10,7 +10,10 @@ jobs:
     steps:
       - checkout:
           path: ~/opwatch
-      - run: perl -0777 -i.orig -pe "s/MANUAL_BUILD/$(cat ../.version)/igs" build.gradle ../build.gradle
+      - run:
+          name: Set Version
+          working_directory: ~/opwatch
+          command: perl -0777 -i.orig -pe "s/MANUAL_BUILD/$(cat .version)/igs" ./server/build.gradle build.gradle
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
