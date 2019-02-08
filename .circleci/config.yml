@@ -1,0 +1,70 @@
+version: 2
+jobs:
+  build_server:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    working_directory: ~/opwatch/server
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout:
+          path: ~/opwatch
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run: gradle build
+      - run: gradle bootJar
+      - persist_to_workspace:
+          root: ~/opwatch/server
+          paths:
+            - Dockerfile
+            - build/libs
+            - build/resources
+  test_server:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    working_directory: ~/repo
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run: gradle check
+      - store_artifacts:
+          path: build/reports
+          destination: build_reports
+      - store_test_results:
+          path: build/test-results
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build_server
+      - test_server:
+          requires:
+            - build_server
+      #- release_server:
+      #          requires:
+      #            - test_server
+      #          filters:
+      #            branches:
+      #              only: master

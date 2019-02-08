@@ -2,12 +2,12 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
     group = 'org.smither.opwatch'
-    version = '1.0'
+    version = '0.0'
     repositories {
         mavenCentral()
     }
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 }
 
 project(':server') {
