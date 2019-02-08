@@ -1,0 +1,3 @@
+name: OpWatchV3
+version: 3.0
+main: org.smither.opwatch.spigot.Plugin
