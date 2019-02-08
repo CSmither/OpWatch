@@ -36,12 +36,13 @@ jobs:
   test_server:
     docker:
       - image: circleci/openjdk:11-jdk
-    working_directory: ~/repo
+    working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
-      - checkout
+      - checkout:
+          path: ~/opwatch
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
@@ -83,7 +84,7 @@ workflows:
       - test_server:
           requires:
             - build_server
-      - publish-releases:
+      - publish-github-release:
           requires:
             - test_server
           filters:
