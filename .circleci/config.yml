@@ -86,7 +86,7 @@ jobs:
             echo $VERSION
             zip ./artifacts/server-$VERSION.zip ./artifacts/server ./artifacts/.version
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
-  docker-release:
+  docker_release:
     docker:
       - image: circleci/python:3.6.6-jessie-browsers
     environment:
