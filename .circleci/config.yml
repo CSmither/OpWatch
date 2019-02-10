@@ -1,5 +1,19 @@
 version: 2
 jobs:
+  notify_start:
+    docker:
+      - image: alpine
+    steps:
+      - run: |
+        curl -X POST http://smither.org:9184/connectChannel -H 'Content-Type: application/json' -d '{"password":"$WEBIRC_PASSWORD", "key":"$DEV_CHANNEL_KEY", "channel":"#dev"}'
+        curl -X POST http://smither.org:9184/sendMsg -H 'Content-Type: application/json' -d '{"password":"$WEBIRC_PASSWORD", "channel":"#dev", "message":"Starting Build on CIRCLE_PROJECT_REPONAME/CIRCLE_BRANCH/CIRCLE_SHA1 -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"}'
+  request_approval:
+    docker:
+      - image: alpine
+    steps:
+      - run: |
+        curl -X POST http://smither.org:9184/connectChannel -H 'Content-Type: application/json' -d '{"password":"$WEBIRC_PASSWORD", "key":"$DEV_CHANNEL_KEY", "channel":"#dev"}'
+        curl -X POST http://smither.org:9184/sendMsg -H 'Content-Type: application/json' -d '{"password":"$WEBIRC_PASSWORD", "channel":"#dev", "message":"Requesting approval for a release on CIRCLE_PROJECT_REPONAME -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"}'
   build_server:
     docker:
       - image: circleci/openjdk:11-jdk
@@ -74,21 +88,70 @@ jobs:
             echo $VERSION
             zip ./artifacts/server-$VERSION.zip ./artifacts/server ./artifacts/.version
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
-
-
-
+  docker-release:
+    docker:
+      - image: circleci/python:3.6.6-jessie-browsers
+    environment:
+      REGISTRY: smither/opwatch-server
+      RELEASE: develop
+    steps:
+      - attach_workspace:
+          at: ~/opwatch
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build Docker image
+          working_directory: ~/opwatch/server
+          command: docker build -t $REGISTRY:$CIRCLE_SHA1 .
+      - run:
+          name: Push docker image to docker hub
+          command: |
+            VERSION=$(cat ~/opwatch/.version)
+            [[ $CIRCLE_BRANCH = "master" ]] && RELEASE="stable" || RELEASE="testing"
+            docker login $DOCKER_USERNAME $DOCKER_PASSWORD
+            docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION-SNAPSHOT
+            docker push $REGISTRY:$RELEASE
+            docker push $REGISTRY:$CIRCLE_SHA1
 
 workflows:
   version: 2
-  build:
+  server:
     jobs:
+      - notify_start
       - build_server
       - test_server:
           requires:
             - build_server
-      - publish-github-release:
+      - docker_release:
           requires:
             - test_server
           filters:
             branches:
+              only:
+                - develop
+                - master
+      - deploy_server:
+          requires:
+            - docker_release
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - release-approval:
+          type: approval # requires that an in-app button be clicked by an appropriate member of the project to continue.
+          requires:
+            - test_server
+            - request_approval
+          filters:
+            branches:
               only: master
+      - publish-github-release:
+          requires:
+            - release-approval
+          filters:
+            branches:
+              only: master
+notify:
+  webhooks:
+    - url: https://host/webhook/
