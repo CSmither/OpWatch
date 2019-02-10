@@ -4,6 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -13,7 +14,7 @@ interface SignEventDAO extends CrudRepository<SignEvent, Long> {
 
   List<SignEvent> findByActioner(String actioner);
 
-  SignEvent findById(UUID id);
+  Optional<SignEvent> findById(UUID id);
 
   List<SignEvent> findBySign(UUID signId);
 }

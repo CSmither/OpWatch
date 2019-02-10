@@ -10,6 +10,8 @@ import org.smither.opwatch.utils.sharedDTO.SignPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +33,7 @@ public class SignEventController {
       authorizations = {@Authorization(value = "jwtAuth")})
   @ApiResponses(
       value = {
-        @ApiResponse(code = 200, message = "Returned on successful call", response = Sign.class),
+        @ApiResponse(code = 200, message = "Returned on successful call", response = SignEvent.class),
         @ApiResponse(code = 403, message = "Forbidden - Login failed")
       })
   //  @PreAuthorize("hasRole('SERVER')")
@@ -39,4 +41,33 @@ public class SignEventController {
   public SignEvent postSignEvent(@RequestBody() SignEventPostDTO signEventPostDTO) {
     return signEventService.createSignEvent(signEventPostDTO);
   }
+  @ApiOperation(
+          value = "Gets all sign Events or events for specific sign",
+          authorizations = {@Authorization(value = "jwtAuth")})
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = 200, message = "Returned on successful call", response = SignEvent.class),
+                  @ApiResponse(code = 403, message = "Forbidden - Login failed")
+          })
+  @GetMapping(value = "/signEvent")
+  public Collection<SignEvent> getSignEvents(@RequestParam(value = "sign", required = false) UUID sign) {
+    if (sign != null) {
+      return signEventService.getEventsForSign(sign);
+    }
+    return signEventService.getEvents();
+  }
+
+  @ApiOperation(
+          value = "Gets specific SignEvent",
+          authorizations = {@Authorization(value = "jwtAuth")})
+  @ApiResponses(
+          value = {
+                  @ApiResponse(code = 200, message = "Returned on successful call", response = SignEvent.class),
+                  @ApiResponse(code = 403, message = "Forbidden - Login failed")
+          })
+  @GetMapping("/signEvent/{}")
+  public SignEvent getSignEventWithId(@PathVariable("id") UUID signEventId) {
+    return signEventService.getSignEvent(signEventId).orElse(null);
+  }
+
 }
