@@ -5,13 +5,13 @@ jobs:
       - image: circleci/python
     steps:
       - run: 'curl -X POST http://smither.org:9184/connectChannel -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"key\":\"(echo $DEV_CHANNEL_KEY)\", \"channel\":\"#dev\"}"'
-      - run: 'curl -X POST http://smither.org:9184/sendMsg -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"channel\":\"#dev\", \"message\":\"Starting Build on $CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH/$CIRCLE_SHA1 -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID\"}"'
+      - run: 'curl -X POST http://smither.org:9184/sendMsg -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"channel\":\"#dev\", \"message\":\"Smither I\'m starting a build on $CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH branch -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID\"}"'
   request_approval:
     docker:
       - image: circleci/python
     steps:
       - run: 'curl -X POST http://smither.org:9184/connectChannel -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"key\":\"(echo $DEV_CHANNEL_KEY)\", \"channel\":\"#dev\"}"'
-      - run: 'curl -X POST http://smither.org:9184/sendMsg -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"channel\":\"#dev\", \"message\":\"Requesting approval for a release on $CIRCLE_PROJECT_REPONAME -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID\"}"'
+      - run: 'curl -X POST http://smither.org:9184/sendMsg -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"channel\":\"#dev\", \"message\":\"Hey Smither any chance of approval for a release on $CIRCLE_PROJECT_REPONAME? -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID\"}"'
   build_server:
     docker:
       - image: circleci/openjdk:11-jdk
