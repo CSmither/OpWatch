@@ -91,7 +91,6 @@ jobs:
       - image: circleci/python:3.6.6-jessie-browsers
     environment:
       REGISTRY: smither/opwatch-server
-      RELEASE: develop
     steps:
       - attach_workspace:
           at: ~/opwatch
@@ -106,10 +105,13 @@ jobs:
           command: |
             VERSION=$(cat ~/opwatch/.version)
             [[ $CIRCLE_BRANCH = "master" ]] && RELEASE="stable" || RELEASE="testing"
-            docker login $DOCKER_USERNAME $DOCKER_PASSWORD
-            docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION-SNAPSHOT
-            docker push $REGISTRY:$RELEASE
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION
+            docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE
+            [[ $CIRCLE_BRANCH = "master" ]] && docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:latest
             docker push $REGISTRY:$CIRCLE_SHA1
+            docker push $REGISTRY:$RELEASE-$VERSION
+            docker push $REGISTRY:$RELEASE
 
 workflows:
   version: 2
