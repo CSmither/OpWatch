@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':utils')
     compile 'com.auth0:java-jwt:3.4.0'
     compile 'com.corundumstudio.socketio:netty-socketio:1.7.16'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
@@ -54,20 +55,10 @@ dependencies {
     testCompile 'com.h2database:h2:1.4.197'
 }
 
-//shadowJar {
-//    mergeServiceFiles()
-//}
-//jar {
-//    manifest {
-//        attributes 'Implementation-Title': 'OpWatch',
-//                'Implementation-Version': version,
-//                'Main-Class': 'springRestTest.Application'
-//    }
-//}
-
 bootJar {
     mainClassName = 'org.smither.opwatch.server.Application'
-    baseName = 'opwatch-server'
+    baseName = 'server'
+    archiveName = "${rootProject.getName()}-${baseName}-${version}.${extension}"
 }
 
 jacoco {

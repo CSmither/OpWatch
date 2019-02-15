@@ -11,6 +11,10 @@ apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'idea'
 
+shadowJar{
+    archiveName = "${rootProject.getName()}-${getBaseName()}-${version}.${extension}"
+}
+
 repositories {
     mavenCentral()
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
@@ -18,10 +22,11 @@ repositories {
 }
 
 dependencies {
+    compile project(':utils')
     compile 'com.auth0:java-jwt:3.4.0'
-    compile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
-    compileOnly 'org.spigotmc:spigot-api:1.13.1-R0.1-SNAPSHOT'
+//    compile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
     compile 'com.hi3project.vineyard.comm:gozirra-ws:0.5.0'
     compileOnly 'org.projectlombok:lombok:1.18.4'
+    compileOnly 'org.spigotmc:spigot-api:1.13.1-R0.1-SNAPSHOT'
     annotationProcessor 'org.projectlombok:lombok:1.18.4'
 }
