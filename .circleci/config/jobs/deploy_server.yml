@@ -1,0 +1,5 @@
+docker:
+  - image: circleci/python
+steps:
+  - slack/notify:
+      message: "Deploy not yet implemented. Just do it!"

@@ -1,0 +1,27 @@
+docker:
+  - image: circleci/python:3.6.6-jessie-browsers
+environment:
+  REGISTRY: smither/opwatch-server
+steps:
+  - attach_workspace:
+      at: ~/opwatch
+  - setup_remote_docker:
+      docker_layer_caching: true
+  - run:
+      name: Build Docker image
+      working_directory: ~/opwatch/server
+      command: docker build -t $REGISTRY:$CIRCLE_SHA1 .
+  - run:
+      name: Push docker image to docker hub
+      command: |
+        export VERSION=$(cat ~/opwatch/.version)
+        [[ $CIRCLE_BRANCH = "master" ]] && RELEASE="stable" || RELEASE="testing"
+        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+        docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION
+        docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE
+        [[ $CIRCLE_BRANCH = "master" ]] && docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:latest
+        docker push $REGISTRY:$CIRCLE_SHA1
+        docker push $REGISTRY:$RELEASE-$VERSION
+        docker push $REGISTRY:$RELEASE
+  - slack/notify:
+      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on docker hub"

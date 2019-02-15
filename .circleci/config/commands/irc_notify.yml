@@ -1,0 +1,8 @@
+description: "Send message to IrcWebBot"
+parameters:
+  message:
+    type: string
+steps:
+  - run:
+      name: Send Message to IRC
+      command: 'curl -X POST http://$WEBIRC_URL/sendMsg -H "Content-Type: application/json" -d "{\"password\":\"$WEBIRC_PASSWORD\", \"channel\":\"$IRC_CHANNEL\", \"key\":\"$IRC_KEY\", \"message\":\"<< parameters.message >>\"}" ; exit 0'
