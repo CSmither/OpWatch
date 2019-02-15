@@ -12,6 +12,7 @@ buildscript {
 apply plugin: 'java'
 //apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'idea'
+apply plugin: 'jacoco'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -49,6 +50,8 @@ dependencies {
 //    compile 'net.md-5:bungeecord-api:1.12-SNAPSHOT'
 //    compileOnly 'org.spigotmc:spigot-api:1.13.1-R0.1-SNAPSHOT'
     testCompile 'org.springframework.boot:spring-boot-starter-test:2.0.6.RELEASE'
+    testCompile 'com.h2database:h2:1.4.197'
+    testCompile 'com.h2database:h2:1.4.197'
 }
 
 //shadowJar {
@@ -65,4 +68,37 @@ dependencies {
 bootJar {
     mainClassName = 'org.smither.opwatch.server.Application'
     baseName = 'opwatch-server'
+}
+
+jacoco {
+    toolVersion = "0.8.2"
+    reportsDir = file("$buildDir/reports")
+}
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("$buildDir/reports/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.0
+            }
+        }
+//        rule {
+//            enabled = false
+//            element = 'CLASS'
+//            includes = ['org.gradle.*']
+//
+//            limit {
+//                counter = 'LINE'
+//                value = 'TOTALCOUNT'
+//                maximum = 0.0
+//            }
+//        }
+    }
 }
