@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 orbs:
   slack: circleci/slack@1.0.0
@@ -61,6 +61,13 @@ jobs:
               curl -X POST https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BUILD_NUM/cancel?circle-token=$CIRCLE_TOKEN
           when: on_fail
     
+  deploy_server:
+    docker:
+      - image: circleci/python
+    steps:
+      - slack/notify:
+          message: "Deploy not yet implemented. Just do it!"
+    
   docker_release:
     docker:
       - image: circleci/python:3.6.6-jessie-browsers
@@ -89,6 +96,12 @@ jobs:
             docker push $REGISTRY:$RELEASE
       - slack/notify:
           message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on docker hub"
+  notify_start:
+    docker:
+      - image: circleci/python
+    steps:
+      - slack/notify:
+          message: "I am starting a build on $CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH branch -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"
   publish_github_release:
     docker:
       - image: cibuilds/github:0.10
@@ -117,7 +130,7 @@ jobs:
           command: |
             VERSION=$(cat ~/opwatch/.version)
       - slack/notify:
-          message:"Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME? -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID\"
+          message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME? -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"
     
   test_server:
     docker:
@@ -150,14 +163,16 @@ jobs:
       - slack/status
   
 
-workflows:
-  version: 2
+workflows: 
   server:
     jobs:
       - check_circle_config
+      - notify_start
+        requires:
+          - check_circle_config
       - build_server:
           requires:
-            - check_circle_config
+            - notify_start
       - test_server:
           requires:
             - build_server
@@ -196,6 +211,8 @@ workflows:
           filters:
             branches:
               only: master
+  
+
 notify:
   webhooks:
     - url: https://host/webhook/
