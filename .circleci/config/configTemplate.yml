@@ -1,0 +1,56 @@
+version: 2
+
+orbs:
+  slack: circleci/slack@1.0.0
+
+jobs: {{jobs}}
+
+workflows:
+  version: 2
+  server:
+    jobs:
+      - check_circle_config
+      - build_server:
+          requires:
+            - check_circle_config
+      - test_server:
+          requires:
+            - build_server
+      - docker_release:
+          requires:
+            - test_server
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - deploy_server:
+          requires:
+            - docker_release
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - request_approval:
+          requires:
+            - test_server
+          filters:
+            branches:
+              only: master
+      - release_approval:
+          type: approval
+          requires:
+            - request_approval
+          filters:
+            branches:
+              only: master
+      - publish_github_release:
+          requires:
+            - release_approval
+          filters:
+            branches:
+              only: master
+notify:
+  webhooks:
+    - url: https://host/webhook/
