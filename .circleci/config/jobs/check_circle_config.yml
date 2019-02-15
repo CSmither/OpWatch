@@ -1,0 +1,19 @@
+docker:
+  - image: circleci/python
+working_directory: ~/opwatch/.circleci
+steps:
+  - checkout:
+      path: ~/opwatch
+  - run: python check_config.py
+  - run:
+      name: Halt and commit when config changed
+      command: |
+          git config --global user.email "$GITHUB_EMAIL"
+          git config --global user.name "$CIRCLE_USERNAME"
+          git add config.yml
+          git commit -m "Config Changed: Updating Circle build Config
+            https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID
+          "
+          git push -q https://$GITHUB_TOKEN@github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git $CIRCLE_BRANCH
+          curl -X POST https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BUILD_NUM/cancel?circle-token=$CIRCLE_TOKEN
+      when: on_fail
