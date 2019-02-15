@@ -1,8 +1,8 @@
 jobs:
   - check_circle_config
-  - notify_start
-    requires:
-      - check_circle_config
+  - notify_start:
+      requires:
+        - check_circle_config
   - build_server:
       requires:
         - notify_start
