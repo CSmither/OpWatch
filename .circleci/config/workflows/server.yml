@@ -9,9 +9,26 @@ jobs:
   - server_test:
       requires:
         - server_build
-  - server_docker_release:
+  - request_approval:
       requires:
         - server_test
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - release_approval:
+      type: approval
+      requires:
+        - request_approval
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - server_docker_release:
+      requires:
+        - release_approval
       filters:
         branches:
           only:
@@ -25,19 +42,6 @@ jobs:
           only:
             - develop
             - master
-  - request_approval:
-      requires:
-        - server_test
-      filters:
-        branches:
-          only: master
-  - release_approval:
-      type: approval
-      requires:
-        - request_approval
-      filters:
-        branches:
-          only: master
   - server_github_release:
       requires:
         - release_approval
