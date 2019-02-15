@@ -1,0 +1,16 @@
+docker:
+  - image: cibuilds/github:0.10
+steps:
+  - checkout:
+      path: ~/opwatch
+  - attach_workspace:
+      at: ./artifacts
+  - run:
+      name: "Publish Release on GitHub"
+      command: |
+        export VERSION=$(cat ~/opwatch/.version)
+        echo $VERSION
+        zip ./artifacts/server-$VERSION.zip ./artifacts/server ./artifacts/.version
+        ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
+  - slack/notify:
+      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on github"
