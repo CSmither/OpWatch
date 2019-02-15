@@ -6,7 +6,3 @@ orbs:
 jobs: {{jobs}}
 
 workflows: {{workflows}}
-
-notify:
-  webhooks:
-    - url: https://host/webhook/
