@@ -1,12 +1,13 @@
 jar {
-    baseName = 'opwatch-utils'
+    baseName = 'utils'
+    archiveName = "${rootProject.getName()}-${getBaseName()}-${version}.${extension}"
 }
 
 repositories {
     mavenCentral()
 }
 
-dependencies{
+dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.4'
     annotationProcessor 'org.projectlombok:lombok:1.18.4'
 }

@@ -1,2 +1,2 @@
-rootProject.name = 'Opwatch'
+rootProject.name = 'opwatch'
 include 'utils', 'server', 'spigot'
