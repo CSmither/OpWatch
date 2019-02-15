@@ -2,4 +2,5 @@ docker:
   - image: circleci/python
 steps:
   - slack/notify:
-      message: "I am starting a build for $CIRCLE_PROJECT_REPONAME on branch $CIRCLE_BRANCH"
+      message: "I am starting a build for $CIRCLE_PROJECT_REPONAME on branch $CIRCLE_BRANCH -> <https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID|WORKFLOW>"
+      color: "#195F93"

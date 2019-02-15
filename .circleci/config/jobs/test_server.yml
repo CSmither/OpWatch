@@ -23,6 +23,4 @@ steps:
       destination: build_reports
   - store_test_results:
       path: build/test-results
-  - slack/notify:
-      message: "Tests complete on $CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH. See results HERE -> https://$CIRCLE_BUILD_NUM-$CIRCLE_PROJECT_NUM-gh.circle-artifacts.com/0/reports/tests/test/index.html"
   - slack/status
