@@ -4,7 +4,55 @@ orbs:
   slack: circleci/slack@1.0.0
 
 jobs: 
-  build_server:
+  check_circle_config:
+    docker:
+      - image: circleci/python
+    working_directory: ~/opwatch/.circleci
+    steps:
+      - checkout:
+          path: ~/opwatch
+      - run: python check_config.py
+      - run:
+          name: Halt and commit when config changed
+          command: |
+              git config --global user.email "$GITHUB_EMAIL"
+              git config --global user.name "$CIRCLE_USERNAME"
+              git add config.yml
+              git commit -m "Config Changed: Updating Circle build Config
+                https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID
+              "
+              git push -q https://$GITHUB_TOKEN@github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git $CIRCLE_BRANCH
+              curl -X POST https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BUILD_NUM/cancel?circle-token=$CIRCLE_TOKEN
+          when: on_fail
+    
+  deploy_server:
+    docker:
+      - image: circleci/python
+    steps:
+      - slack/notify:
+          message: "Deploy not yet implemented. Just do it!"
+    
+  notify_start:
+    docker:
+      - image: circleci/python
+    steps:
+      - slack/notify:
+          message: "I am starting a build for $CIRCLE_PROJECT_REPONAME on branch $CIRCLE_BRANCH -> <https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID|WORKFLOW>"
+          color: "#195F93"
+  request_approval:
+    docker:
+      - image: circleci/python
+    steps:
+      - attach_workspace:
+          at: ~/opwatch
+      - run:
+          name: Get Version
+          command: |
+            VERSION=$(cat ~/opwatch/.version)
+      - slack/approval:
+          message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME?"
+    
+  server_build:
     docker:
       - image: circleci/openjdk:11-jdk
     working_directory: ~/opwatch/server
@@ -38,35 +86,7 @@ jobs:
             - server/build/resources
             - .version
     
-  check_circle_config:
-    docker:
-      - image: circleci/python
-    working_directory: ~/opwatch/.circleci
-    steps:
-      - checkout:
-          path: ~/opwatch
-      - run: python check_config.py
-      - run:
-          name: Halt and commit when config changed
-          command: |
-              git config --global user.email "$GITHUB_EMAIL"
-              git config --global user.name "$CIRCLE_USERNAME"
-              git add config.yml
-              git commit -m "Config Changed: Updating Circle build Config
-                https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID
-              "
-              git push -q https://$GITHUB_TOKEN@github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME.git $CIRCLE_BRANCH
-              curl -X POST https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BUILD_NUM/cancel?circle-token=$CIRCLE_TOKEN
-          when: on_fail
-    
-  deploy_server:
-    docker:
-      - image: circleci/python
-    steps:
-      - slack/notify:
-          message: "Deploy not yet implemented. Just do it!"
-    
-  docker_release:
+  server_docker_release:
     docker:
       - image: circleci/python:3.6.6-jessie-browsers
     environment:
@@ -94,14 +114,7 @@ jobs:
             docker push $REGISTRY:$RELEASE
       - slack/notify:
           message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on docker hub"
-  notify_start:
-    docker:
-      - image: circleci/python
-    steps:
-      - slack/notify:
-          message: "I am starting a build for $CIRCLE_PROJECT_REPONAME on branch $CIRCLE_BRANCH -> <https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID|WORKFLOW>"
-          color: "#195F93"
-  publish_github_release:
+  server_github_release:
     docker:
       - image: cibuilds/github:0.10
     steps:
@@ -118,20 +131,7 @@ jobs:
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
       - slack/notify:
           message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on github"
-  request_approval:
-    docker:
-      - image: circleci/python
-    steps:
-      - attach_workspace:
-          at: ~/opwatch
-      - run:
-          name: Get Version
-          command: |
-            VERSION=$(cat ~/opwatch/.version)
-      - slack/notify:
-          message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME? -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"
-    
-  test_server:
+  server_test:
     docker:
       - image: circleci/openjdk:11-jdk
     working_directory: ~/opwatch/server
@@ -167,15 +167,32 @@ workflows:
       - notify_start:
           requires:
             - check_circle_config
-      - build_server:
+      - server_build:
           requires:
             - notify_start
-      - test_server:
+      - server_test:
           requires:
-            - build_server
-      - docker_release:
+            - server_build
+      - request_approval:
           requires:
-            - test_server
+            - server_test
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - release_approval:
+          type: approval
+          requires:
+            - request_approval
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - server_docker_release:
+          requires:
+            - release_approval
           filters:
             branches:
               only:
@@ -183,33 +200,16 @@ workflows:
                 - master
       - deploy_server:
           requires:
-            - docker_release
+            - server_docker_release
           filters:
             branches:
               only:
                 - develop
                 - master
-      - request_approval:
-          requires:
-            - test_server
-          filters:
-            branches:
-              only: master
-      - release_approval:
-          type: approval
-          requires:
-            - request_approval
-          filters:
-            branches:
-              only: master
-      - publish_github_release:
+      - server_github_release:
           requires:
             - release_approval
           filters:
             branches:
               only: master
   
-
-notify:
-  webhooks:
-    - url: https://host/webhook/
