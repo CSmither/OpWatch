@@ -2,7 +2,7 @@
 import os
 import sys
 
-templatable = ["jobs", "commands"]
+templatable = ["jobs", "commands", "workflows"]
 config = ""
 with open("config/configTemplate.yml", "r") as template:
     config = template.read()
