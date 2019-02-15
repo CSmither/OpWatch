@@ -1,0 +1,11 @@
+docker:
+  - image: circleci/python
+steps:
+  - attach_workspace:
+      at: ~/opwatch
+  - run:
+      name: Get Version
+      command: |
+        VERSION=$(cat ~/opwatch/.version)
+  - slack/notify:
+      message:"Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME? -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID\"
