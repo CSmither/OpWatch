@@ -49,8 +49,8 @@ jobs:
           name: Get Version
           command: |
             VERSION=$(cat ~/opwatch/.version)
-      - slack/notify:
-          message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME? -> https://circleci.com/workflow-run/$CIRCLE_WORKFLOW_ID"
+      - slack/approval:
+          message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME?"
     
   server_build:
     docker:
@@ -173,9 +173,26 @@ workflows:
       - server_test:
           requires:
             - server_build
-      - server_docker_release:
+      - request_approval:
           requires:
             - server_test
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - release_approval:
+          type: approval
+          requires:
+            - request_approval
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - server_docker_release:
+          requires:
+            - release_approval
           filters:
             branches:
               only:
@@ -189,19 +206,6 @@ workflows:
               only:
                 - develop
                 - master
-      - request_approval:
-          requires:
-            - server_test
-          filters:
-            branches:
-              only: master
-      - release_approval:
-          type: approval
-          requires:
-            - request_approval
-          filters:
-            branches:
-              only: master
       - server_github_release:
           requires:
             - release_approval
