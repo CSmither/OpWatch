@@ -2,4 +2,15 @@ docker:
   - image: circleci/python
 steps:
   - slack/notify:
-      message: "Deploy not yet implemented. Just do it!"
+      message: "Deploying services"
+  - add_ssh_keys:
+      fingerprints:
+        - "8d:1b:63:5b:c4:a8:3d:c2:ae:b2:90:ff:15:95:2e:37"
+  - run: ssh gameserv@:smither.org "\
+            cd ~/games/minecraft/opwatch-develop/docker-compose && \
+            git fetch && git reset --hard origin/develop \
+            docker-compose kill -f \
+            docker-compose rm -f \
+            docker-compose up -d"
+  - slack/notify:
+           message: "Services deployed on smither.org:8888 and smither.org:25570"
