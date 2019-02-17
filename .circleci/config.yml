@@ -25,12 +25,23 @@ jobs:
               curl -X POST https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BUILD_NUM/cancel?circle-token=$CIRCLE_TOKEN
           when: on_fail
     
-  deploy_server:
+  deploy:
     docker:
       - image: circleci/python
     steps:
       - slack/notify:
-          message: "Deploy not yet implemented. Just do it!"
+          message: "Deploying services"
+      - add_ssh_keys:
+          fingerprints:
+            - "8d:1b:63:5b:c4:a8:3d:c2:ae:b2:90:ff:15:95:2e:37"
+      - run: ssh gameserv@:smither.org "\
+                cd ~/games/minecraft/opwatch-develop/docker-compose && \
+                git fetch && git reset --hard origin/develop \
+                docker-compose kill -f \
+                docker-compose rm -f \
+                docker-compose up -d"
+      - slack/notify:
+               message: "Services deployed on smither.org:8888 and smither.org:25570"
     
   notify_start:
     docker:
@@ -113,7 +124,7 @@ jobs:
             docker push $REGISTRY:$RELEASE-$VERSION
             docker push $REGISTRY:$RELEASE
       - slack/notify:
-          message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on docker hub"
+          message: "${CIRCLE_PROJECT_REPONAME} v$VERSION server released on docker hub"
   server_github_release:
     docker:
       - image: cibuilds/github:0.10
@@ -158,10 +169,98 @@ jobs:
       - store_test_results:
           path: build/test-results
       - slack/status
+  spigot_build:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    working_directory: ~/opwatch/spigot
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout:
+          path: ~/opwatch
+      - run:
+          name: Set Version
+          working_directory: ~/opwatch
+          command: perl -0777 -i.orig -pe "s/MANUAL_BUILD/$(cat .version)/igs" ./spigot/build.gradle build.gradle
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run: gradle build
+      - run: gradle jar
+      - persist_to_workspace:
+          root: ~/opwatch
+          paths:
+            - spigot/Dockerfile
+            - spigot/build/libs
+            - spigot/build/resources
+    
+  spigot_docker_release:
+    docker:
+      - image: circleci/python:3.6.6-jessie-browsers
+    environment:
+      REGISTRY: smither/opwatch-spigot
+    steps:
+      - attach_workspace:
+          at: ~/opwatch
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build Docker image
+          working_directory: ~/opwatch/spigot
+          command: docker build -t $REGISTRY:$CIRCLE_SHA1 .
+      - run:
+          name: Push docker image to docker hub
+          command: |
+            export VERSION=$(cat ~/opwatch/.version)
+            [[ $CIRCLE_BRANCH = "master" ]] && RELEASE="stable" || RELEASE="testing"
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION
+            docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE
+            [[ $CIRCLE_BRANCH = "master" ]] && docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:latest
+            docker push $REGISTRY:$CIRCLE_SHA1
+            docker push $REGISTRY:$RELEASE-$VERSION
+            docker push $REGISTRY:$RELEASE
+      - slack/notify:
+          message: "${CIRCLE_PROJECT_REPONAME} v$VERSION spigot released on docker hub"
+  spigot_test:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    working_directory: ~/opwatch/spigot
+    environment:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - checkout:
+          path: ~/opwatch
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: gradle dependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+      - run: gradle check
+      - store_artifacts:
+          path: build/reports
+          destination: build_reports
+      - store_test_results:
+          path: build/test-results
+      - slack/status
   
 
 workflows: 
-  server:
+  opwatch:
     jobs:
       - check_circle_config
       - notify_start:
@@ -173,9 +272,16 @@ workflows:
       - server_test:
           requires:
             - server_build
+      - spigot_build:
+          requires:
+            - notify_start
+      - spigot_test:
+          requires:
+            - spigot_build
       - request_approval:
           requires:
             - server_test
+            - spigot_test
           filters:
             branches:
               only:
@@ -198,9 +304,18 @@ workflows:
               only:
                 - develop
                 - master
-      - deploy_server:
+      - spigot_docker_release:
+          requires:
+            - release_approval
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - deploy:
           requires:
             - server_docker_release
+            - spigot_docker_release
           filters:
             branches:
               only:
