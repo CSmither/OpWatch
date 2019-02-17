@@ -29,4 +29,3 @@ steps:
         - spigot/Dockerfile
         - spigot/build/libs
         - spigot/build/resources
-        - .version
