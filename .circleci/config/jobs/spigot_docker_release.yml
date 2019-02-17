@@ -1,7 +1,7 @@
 docker:
   - image: circleci/python:3.6.6-jessie-browsers
 environment:
-  REGISTRY: smither/opwatch-server
+  REGISTRY: smither/opwatch-spigot
 steps:
   - attach_workspace:
       at: ~/opwatch
@@ -9,7 +9,7 @@ steps:
       docker_layer_caching: true
   - run:
       name: Build Docker image
-      working_directory: ~/opwatch/server
+      working_directory: ~/opwatch/spigot
       command: docker build -t $REGISTRY:$CIRCLE_SHA1 .
   - run:
       name: Push docker image to docker hub
@@ -24,4 +24,4 @@ steps:
         docker push $REGISTRY:$RELEASE-$VERSION
         docker push $REGISTRY:$RELEASE
   - slack/notify:
-      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION server released on docker hub"
+      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION spigot released on docker hub"
