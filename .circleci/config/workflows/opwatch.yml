@@ -9,9 +9,16 @@ jobs:
   - server_test:
       requires:
         - server_build
+  - spigot_build:
+      requires:
+        - notify_start
+  - spigot_test:
+      requires:
+        - spigot_build
   - request_approval:
       requires:
         - server_test
+        - spigot_test
       filters:
         branches:
           only:
@@ -34,9 +41,18 @@ jobs:
           only:
             - develop
             - master
-  - deploy_server:
+  - spigot_docker_release:
+      requires:
+        - release_approval
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - deploy:
       requires:
         - server_docker_release
+        - spigot_docker_release
       filters:
         branches:
           only:
