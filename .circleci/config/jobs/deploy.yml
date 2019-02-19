@@ -9,9 +9,9 @@ steps:
   - run: ssh-keyscan -H smither.org >> ~/.ssh/known_hosts
   - run: ssh gameserv@smither.org "
             cd ~/games/minecraft/opwatch-develop/docker-compose &&
-            git fetch && git reset --hard origin/develop
-            docker-compose kill -f
-            docker-compose rm -f
+            git fetch && git reset --hard origin/develop &&
+            docker-compose kill -f &&
+            docker-compose rm -f &&
             docker-compose up -d"
   - slack/notify:
            message: "Services deployed on smither.org:8888 and smither.org:25570"
