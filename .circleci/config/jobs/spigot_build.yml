@@ -22,7 +22,7 @@ steps:
         - ~/.gradle
       key: v1-dependencies-{{ checksum "build.gradle" }}
   - run: gradle build
-  - run: gradle jar
+  - run: gradle shadowJar
   - persist_to_workspace:
       root: ~/opwatch
       paths:
