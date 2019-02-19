@@ -4,7 +4,7 @@ EXPOSE 25565
 WORKDIR /spigot
 RUN mkdir /spigot/plugins
 RUN mkdir /spigot/plugins/opwatch
-RUN curl https://cdn.getbukkit.org/spigot/spigot-1.13.2.jar -o /spigot/spigot.jar
+ADD https://cdn.getbukkit.org/spigot/spigot-1.13.2.jar /spigot/spigot.jar
 COPY ./build/libs/opwatch-spigot-*.jar /spigot/plugins/opwatch-spigot.jar
 
 
