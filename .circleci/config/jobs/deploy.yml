@@ -6,7 +6,7 @@ steps:
   - add_ssh_keys:
       fingerprints:
         - "8d:1b:63:5b:c4:a8:3d:c2:ae:b2:90:ff:15:95:2e:37"
-  - run: ssh gameserv@:smither.org "\
+  - run: ssh gameserv@smither.org "\
             cd ~/games/minecraft/opwatch-develop/docker-compose && \
             git fetch && git reset --hard origin/develop \
             docker-compose kill -f \
