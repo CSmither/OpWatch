@@ -10,7 +10,7 @@ steps:
   - run: ssh gameserv@smither.org "
             cd ~/games/minecraft/opwatch-develop/docker-compose &&
             git fetch && git reset --hard origin/develop &&
-            docker-compose kill -f &&
+            docker-compose kill &&
             docker-compose rm -f &&
             docker-compose up -d"
   - slack/notify:
