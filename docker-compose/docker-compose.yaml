@@ -7,7 +7,7 @@ services:
     volumes:
       - "configs/opwatch.yml:/spigot/plugins/opwatch/config.yml"
     env_file:
-      - "spigot.env"
+      - "configs/spigot.env"
   server:
     build: ../server
     ports:
@@ -15,8 +15,8 @@ services:
     depends_on:
       - db
     env_file:
-      - "server.env"
+      - "configs/server.env"
   db:
     image: mariadb:10.4.2-bionic
     env_file:
-      - "db.env"
+      - "configs/db.env"
