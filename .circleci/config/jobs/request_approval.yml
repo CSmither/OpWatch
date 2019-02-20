@@ -3,9 +3,5 @@ docker:
 steps:
   - attach_workspace:
       at: ~/opwatch
-  - run:
-      name: Get Version
-      command: |
-        VERSION=$(cat ~/opwatch/.version)
   - slack/approval:
-      message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME?"
+      message: "Hey, any chance of approval to release $(cat ~/opwatch/.version) on $CIRCLE_PROJECT_REPONAME?"
