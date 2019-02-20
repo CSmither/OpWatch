@@ -8,4 +8,4 @@ ADD https://cdn.getbukkit.org/spigot/spigot-1.13.2.jar /spigot/spigot.jar
 COPY ./build/libs/opwatch-spigot-*.jar /spigot/plugins/opwatch-spigot.jar
 
 
-ENTRYPOINT ["exec", "java","-jar","spigot.jar","$JAVA_OPTS"]
+ENTRYPOINT ["exec", "java","$JAVA_OPTS","-jar","spigot.jar"]
