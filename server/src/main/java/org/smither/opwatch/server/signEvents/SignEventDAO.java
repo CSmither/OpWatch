@@ -16,5 +16,5 @@ interface SignEventDAO extends CrudRepository<SignEvent, Long> {
 
   Optional<SignEvent> findById(UUID id);
 
-  List<SignEvent> findBySign(UUID signId);
+  List<SignEvent> findBySignId(UUID signId);
 }

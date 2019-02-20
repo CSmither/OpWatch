@@ -51,7 +51,7 @@ public class SignEventService {
     }
 
     public Collection<SignEvent> getEventsForSign(UUID sign) {
-        return signEventDAO.findBySign(sign);
+        return signEventDAO.findBySignId(sign);
     }
 
     public List<SignEvent> getEvents() {
