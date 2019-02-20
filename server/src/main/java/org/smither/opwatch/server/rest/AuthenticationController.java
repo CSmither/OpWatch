@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Api(value = "Authentication",
-        description = "Operations pertaining to User details (For " + "authentication see token)")
+        description = "Operations pertaining Authentication")
 public class AuthenticationController {
 
     private JwtTokenProvider jwtTokenProvider;
@@ -84,28 +84,6 @@ public class AuthenticationController {
             System.out.println(e.getClass());
             response.setStatus(500);
             return null;
-        }
-    }
-
-    @ApiOperation(value = "Registers a new user")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Never returned but swagger won't let me get rid of it"),
-            @ApiResponse(code = 201, message = "User successfully registered"),
-            @ApiResponse(code = 400, message = "Invalid parameters"),
-            @ApiResponse(code = 401, message = "Invalid username / password"),
-            @ApiResponse(code = 409, message = "User exists")
-    })
-    @PostMapping(value = "/user")
-    public void register(@RequestBody RegisterDTO registerDTO, HttpServletResponse response) {
-        try {
-            userService.createUser(registerDTO.getUsername(), registerDTO.getPassword());
-            response.setStatus(201);
-        } catch (DataIntegrityViolationException e) {
-            response.setStatus(409);
-        } catch (IllegalArgumentException e) {
-            response.setStatus(400);
-        } catch (AuthenticationCredentialsNotFoundException e) {
-            response.setStatus(401);
         }
     }
 
