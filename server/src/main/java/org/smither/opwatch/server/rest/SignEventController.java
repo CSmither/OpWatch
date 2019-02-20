@@ -65,7 +65,7 @@ public class SignEventController {
                   @ApiResponse(code = 200, message = "Returned on successful call", response = SignEvent.class),
                   @ApiResponse(code = 403, message = "Forbidden - Login failed")
           })
-  @GetMapping("/signEvent/{}")
+  @GetMapping("/signEvent/{id}")
   public SignEvent getSignEventWithId(@PathVariable("id") UUID signEventId) {
     return signEventService.getSignEvent(signEventId).orElse(null);
   }
