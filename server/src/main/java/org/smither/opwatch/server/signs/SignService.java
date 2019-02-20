@@ -54,7 +54,7 @@ public class SignService {
     }
 
     public List<Sign> getSigns() {
-        return Lists.newArrayList(signDAO.findAll());
+        return signDAO.findAll();
     }
 
     public List<Sign> getSignsWithPlacer(UUID placer) {
