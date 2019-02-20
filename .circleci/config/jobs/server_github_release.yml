@@ -13,4 +13,4 @@ steps:
         zip ./artifacts/server-$VERSION.zip ./artifacts/server ./artifacts/.version
         ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
   - slack/notify:
-      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on github"
+      message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) released on github"

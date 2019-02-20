@@ -24,4 +24,4 @@ steps:
         docker push $REGISTRY:$RELEASE-$VERSION
         docker push $REGISTRY:$RELEASE
   - slack/notify:
-      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION spigot released on docker hub"
+      message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) spigot released on docker hub"
