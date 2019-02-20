@@ -13,7 +13,7 @@ services:
     ports:
       - "8888:8080"
     depends_on:
-      - db
+      - database
     env_file:
       - "configs/server.env"
   database:
