@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 interface SignDAO extends CrudRepository<Sign, UUID> {
 
-    List<Sign> findByPlacer(String placer);
+    List<Sign> findByPlacer(UUID placer);
 
     List<Sign> findByChecked(boolean checked);
 
