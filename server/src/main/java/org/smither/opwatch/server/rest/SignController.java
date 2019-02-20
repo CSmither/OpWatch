@@ -36,9 +36,8 @@ public class SignController {
         @ApiResponse(code = 403, message = "Forbidden - Login failed")
       })
   @GetMapping(value = "/sign")
-  public List<Sign> getSign(@RequestParam(value = "placer", required = false) String placerString) {
-    if (placerString != null) {
-      UUID placer=UUID.fromString(placerString);
+  public List<Sign> getSign(@RequestParam(value = "placer", required = false) UUID placer) {
+    if (placer != null) {
       return signService.getSignsWithPlacer(placer);
     }
     return signService.getSigns();

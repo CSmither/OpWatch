@@ -58,7 +58,7 @@ public class SignService {
     }
 
     public List<Sign> getSignsWithPlacer(UUID placer) {
-        return signDAO.findByPlacer(placer.toString());
+        return signDAO.findByPlacer(placer);
     }
 
     public List<Sign> getSignsWithServerWithWorldWithXWithYWithZ(UUID server, String world, int x, int y, int z) {
