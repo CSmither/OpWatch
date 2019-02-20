@@ -1,7 +1,7 @@
 version: "3"
 services:
   spigot:
-    build: ../spigot
+    image: smither/opwatch-spigot:testing
     ports:
       - "25570:25565"
     volumes:
@@ -9,7 +9,7 @@ services:
     env_file:
       - "configs/spigot.env"
   server:
-    build: ../server
+    image: smither/opwatch-server:testing
     ports:
       - "8888:8080"
     depends_on:
