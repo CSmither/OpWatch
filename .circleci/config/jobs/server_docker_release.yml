@@ -24,4 +24,4 @@ steps:
         docker push $REGISTRY:$RELEASE-$VERSION
         docker push $REGISTRY:$RELEASE
   - slack/notify:
-      message: "${CIRCLE_PROJECT_REPONAME} v$VERSION server released on docker hub"
+      message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) server released on docker hub"
