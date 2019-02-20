@@ -50,7 +50,7 @@ public class SignEventController {
                   @ApiResponse(code = 403, message = "Forbidden - Login failed")
           })
   @GetMapping(value = "/signEvent")
-  public Collection<SignEvent> getSignEvents(@RequestParam(value = "sign", required = false) UUID sign) {
+  public Collection<SignEvent> getSignEvents(@RequestParam(required = false) UUID sign) {
     if (sign != null) {
       return signEventService.getEventsForSign(sign);
     }
