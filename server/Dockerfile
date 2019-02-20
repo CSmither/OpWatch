@@ -5,4 +5,4 @@ WORKDIR /opwatch-server
 COPY /build/libs/opwatch-server-*.jar app.jar
 COPY /build/resources/main/* resources/*
 
-ENTRYPOINT ["java", "-jar", "/opwatch-server/app.jar", "$JAVA_OPTS"]
+ENTRYPOINT ["exec", "java", "-jar", "/opwatch-server/app.jar", "$JAVA_OPTS"]
