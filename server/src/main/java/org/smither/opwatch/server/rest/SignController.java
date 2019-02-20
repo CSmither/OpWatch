@@ -10,6 +10,7 @@ import org.smither.opwatch.utils.sharedDTO.SignPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,11 +36,12 @@ public class SignController {
         @ApiResponse(code = 403, message = "Forbidden - Login failed")
       })
   @GetMapping(value = "/sign")
-  public Sign[] getSign(@RequestParam(required = false) UUID placer) {
-    if (placer != null) {
-      return signService.getSignsWithPlacer(placer).toArray(new Sign[] {});
+  public List<Sign> getSign(@RequestParam(value = "placer", required = false) String placerString) {
+    if (placerString != null) {
+      UUID placer=UUID.fromString(placerString);
+      return signService.getSignsWithPlacer(placer);
     }
-    return signService.getSigns().toArray(new Sign[] {});
+    return signService.getSigns();
   }
 
   @ApiOperation(
