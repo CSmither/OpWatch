@@ -16,7 +16,7 @@ services:
       - db
     env_file:
       - "configs/server.env"
-  db:
+  database:
     image: mariadb:10.4.2-bionic
     env_file:
       - "configs/db.env"
