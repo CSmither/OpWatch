@@ -50,7 +50,7 @@ public class SignController {
         @ApiResponse(code = 200, message = "Returned on successful call", response = Sign.class),
         @ApiResponse(code = 403, message = "Forbidden - Login failed")
       })
-  @GetMapping("/sign/{}")
+  @GetMapping("/sign/{id}")
   public Sign getSignWithId(@PathVariable("id") UUID signId) {
     return signService.getSign(signId).orElse(null);
   }
