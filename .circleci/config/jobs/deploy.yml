@@ -12,6 +12,7 @@ steps:
             git fetch && git reset --hard origin/develop &&
             docker-compose kill &&
             docker-compose rm -f &&
+            docker-compose pull &&
             docker-compose -p opwatch_dev up -d "
   - slack/notify:
            message: "Services deployed on smither.org:8888 and smither.org:25570"
