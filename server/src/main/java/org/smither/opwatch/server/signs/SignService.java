@@ -65,4 +65,7 @@ public class SignService {
         return signDAO.findByServerAndWorldAndXAndYAndZ(server,world,x,y,z);
     }
 
+    public List<Sign> getSignsWithChecked(Boolean checked) {
+        return signDAO.findByChecked(checked);
+    }
 }

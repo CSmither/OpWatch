@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @RestController
-@Api(value = "SignEvents", description = "Operations pertaining to sign events")
+@Api(value = "SignEvents", description = "Operations pertaining to changes that have happened to signs")
 public class SignEventController {
 
     private final SignService signService;
@@ -26,7 +26,7 @@ public class SignEventController {
     }
 
     @ApiOperation(
-            value = "Gets all signs, or signs that have placed by a specific person",
+            value = "Post a new SignEvent",
             authorizations = {@Authorization(value = "jwtAuth")})
     @ApiResponses(
             value = {
@@ -40,7 +40,7 @@ public class SignEventController {
     }
 
     @ApiOperation(
-            value = "Gets all sign Events or events for specific sign",
+            value = "Gets all sign Events or events for a specific sign by its ID",
             authorizations = {@Authorization(value = "jwtAuth")})
     @ApiResponses(
             value = {
@@ -56,7 +56,7 @@ public class SignEventController {
     }
 
     @ApiOperation(
-            value = "Gets specific SignEvent",
+            value = "Gets specific SignEvent by its ID",
             authorizations = {@Authorization(value = "jwtAuth")})
     @ApiResponses(
             value = {

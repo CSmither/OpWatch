@@ -28,7 +28,7 @@ public class SignController {
   }
 
   @ApiOperation(
-      value = "Gets all signs, or signs that have placed by a specific person",
+      value = "Gets all signs, or signs that have placed by a specific person, or signs that have a specific checked status",
       authorizations = {@Authorization(value = "jwtAuth")})
   @ApiResponses(
       value = {
@@ -36,15 +36,17 @@ public class SignController {
         @ApiResponse(code = 403, message = "Forbidden - Login failed")
       })
   @GetMapping(value = "/sign")
-  public List<Sign> getSign(@RequestParam(value = "placer", required = false) UUID placer) {
+  public List<Sign> getSign(@RequestParam(value = "placer", required = false) UUID placer, @RequestParam(value = "checked", required = false) Boolean checked) {
     if (placer != null) {
       return signService.getSignsWithPlacer(placer);
+    } else if(checked != null){
+      return signService.getSignsWithChecked(checked);
     }
     return signService.getSigns();
   }
 
   @ApiOperation(
-      value = "Gets all signs, or signs that have placed by a specific person",
+      value = "Gets a specific sign by its ID",
       authorizations = {@Authorization(value = "jwtAuth")})
   @ApiResponses(
       value = {
@@ -57,7 +59,7 @@ public class SignController {
   }
 
   @ApiOperation(
-      value = "Gets all signs, or signs that have placed by a specific person",
+      value = "Post new sign to service to be stored",
       authorizations = {@Authorization(value = "jwtAuth")})
   @ApiResponses(
       value = {
@@ -71,7 +73,7 @@ public class SignController {
   }
 
   @ApiOperation(
-      value = "Gets all signs, or signs that have placed by a specific person",
+      value = "Post a request for something to happen to an existing sign. e.g. request the text is changed, it is delete, etc.",
       authorizations = {@Authorization(value = "jwtAuth")})
   @ApiResponses(
       value = {
