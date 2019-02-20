@@ -29,12 +29,14 @@ public final class Sign {
 
     private LocalDateTime time;
 
+    @Type(type = "uuid-char")
     private UUID placer;
 
     @Id
     @Type(type = "uuid-char")
     private UUID id;
 
+    @Type(type = "uuid-char")
     private UUID server;
 
     private int x;

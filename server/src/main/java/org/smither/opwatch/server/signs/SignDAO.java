@@ -11,6 +11,8 @@ interface SignDAO extends CrudRepository<Sign, UUID> {
 
     List<Sign> findByPlacer(UUID placer);
 
+    List<Sign> findAll();
+
     List<Sign> findByChecked(boolean checked);
 
     List<Sign> findByServerAndWorldAndXAndYAndZ(UUID server, String world, int x, int y, int z);
