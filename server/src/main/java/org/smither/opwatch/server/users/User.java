@@ -8,10 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @AllArgsConstructor
@@ -85,4 +82,7 @@ public final class User implements UserDetails, Serializable {
         this.password = BCrypt.hashpw(password, BCrypt.gensalt(10));
     }
 
+    public void addAuthority(Authority authority) {
+        authorities.add(authority);
+    }
 }

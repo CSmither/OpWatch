@@ -4,22 +4,24 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public final class Authority implements GrantedAuthority {
 
     @Id
-    @Column(name = "authority_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id")
+    @Type(type = "uuid-char")
+    private UUID id;
 
     private String authority;
 
@@ -29,5 +31,16 @@ public final class Authority implements GrantedAuthority {
                     CascadeType.MERGE
             },
             mappedBy = "authorities")
+    @Setter
     private List<User> users;
+
+    public Authority(String authority) {
+        setAuthority(authority);
+        this.users = new ArrayList<>();
+        this.id=UUID.randomUUID();
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority.toUpperCase();
+    }
 }
