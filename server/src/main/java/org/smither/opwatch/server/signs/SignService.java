@@ -20,12 +20,14 @@ public class SignService {
     private SignDAO signDAO;
 
     private RegexService regexService;
+
     private SignEventService signEventService;
 
     @Autowired
-    SignService(SignDAO signDAO, RegexService regexService) {
+    public SignService(SignDAO signDAO, RegexService regexService, SignEventService signEventService) {
         this.signDAO = signDAO;
         this.regexService = regexService;
+        this.signEventService = signEventService;
     }
 
     public Sign createSign(SignPostDTO sp) {

@@ -33,7 +33,4 @@ public final class SignPostDTO {
 
     private String world;
 
-    private boolean checked;
-
-
 }

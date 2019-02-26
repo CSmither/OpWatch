@@ -4,36 +4,24 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.smither.opwatch.server.auth.JwtTokenProvider;
-import org.smither.opwatch.server.auth.TokenPair;
-import org.smither.opwatch.server.users.UserService;
+import org.smither.opwatch.server.auth.AuthService;
 import org.smither.opwatch.utils.sharedDTO.LoginDTO;
-import org.smither.opwatch.utils.sharedDTO.RegisterDTO;
 import org.smither.opwatch.utils.sharedDTO.TokenReturnDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @Api(value = "Authentication",
         description = "Operations pertaining Authentication")
 public class AuthenticationController {
 
-    private JwtTokenProvider jwtTokenProvider;
-
-    private UserService userService;
+    private AuthService authService;
 
     @Autowired
-    public AuthenticationController(
-            UserService userService, JwtTokenProvider jwtTokenProvider
-    ) {
-        this.userService = userService;
-        this.jwtTokenProvider = jwtTokenProvider;
+    public AuthenticationController(AuthService authService) {
+        this.authService = authService;
     }
 
     @ApiOperation(value = "Login: Fetches a token pair for the user, either pass refresh token or " +
@@ -48,43 +36,8 @@ public class AuthenticationController {
             @ApiResponse(code = 403, message = "Forbidden - Login failed")
     })
     @PostMapping(value = "/token", produces = "application/json", consumes = "application/json")
-    public TokenReturnDTO login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
-        try {
-            if (!loginDTO.isValidRequest()) {
-                response.sendError(403, "Field Invalid.");
-                return null;
-            }
-            if (loginDTO.getUsername() != null && loginDTO.getPassword() != null) {
-                TokenPair returnable = jwtTokenProvider.login(loginDTO.getUsername(),
-                        loginDTO.getPassword()
-                );
-                if (returnable == null) {
-                    response.setStatus(403); //
-                    return null;
-                }
-                response.setStatus(201); //
-                return TokenReturnDTO.builder().access(returnable.getAccess()).refresh(returnable.getRefresh()).build();
-            } else if (loginDTO.getRefresh() != null) {
-                TokenPair returnable = jwtTokenProvider.refresh(loginDTO.getRefresh());
-                if (returnable == null) {
-                    response.setStatus(403); //
-                    return null;
-                }
-                response.setStatus(201); //
-                return TokenReturnDTO.builder().access(returnable.getAccess()).refresh(returnable.getRefresh()).build();
-            } else {
-                response.sendError(403, "Field Invalid.");
-                return null;
-            }
-        } catch (AuthenticationCredentialsNotFoundException E) {
-            response.setStatus(403);
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getClass());
-            response.setStatus(500);
-            return null;
-        }
+    public TokenReturnDTO login(@RequestBody LoginDTO loginDTO) {
+        return authService.login(loginDTO);
     }
 
 }

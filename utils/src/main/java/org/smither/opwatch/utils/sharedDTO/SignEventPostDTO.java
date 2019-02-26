@@ -1,6 +1,7 @@
 package org.smither.opwatch.utils.sharedDTO;
 
 import lombok.*;
+import org.smither.opwatch.utils.SignChangeReason;
 import org.smither.opwatch.utils.SignChangeType;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class SignEventPostDTO {
 
   private String editor;
 
-  private String reason;
+  private SignChangeReason reason;
 
   private String newLine1;
   private String newLine2;

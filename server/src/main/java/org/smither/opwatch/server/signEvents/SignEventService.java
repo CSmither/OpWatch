@@ -2,7 +2,7 @@ package org.smither.opwatch.server.signEvents;
 
 import org.smither.opwatch.server.profanity.RegexService;
 import org.smither.opwatch.server.signs.Sign;
-import org.smither.opwatch.server.signs.SignService;
+import org.smither.opwatch.server.signs.SignDAO;
 import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,20 +17,21 @@ public class SignEventService {
 
     private SignEventDAO signEventDAO;
 
+    private SignDAO signDAO;
+
     private RegexService regexService;
-    private SignService signService;
 
     @Autowired
     public SignEventService(
-            SignEventDAO signEventDAO, RegexService regexService, SignService signService) {
+            SignEventDAO signEventDAO, RegexService regexService, SignDAO signDAO) {
         this.signEventDAO = signEventDAO;
         this.regexService = regexService;
-        this.signService = signService;
+        this.signDAO = signDAO;
     }
 
     public SignEvent createSignEvent(SignEventPostDTO sep) {
         List<Sign> related =
-                signService.getSignsWithServerWithWorldWithXWithYWithZ(
+                signDAO.findByServerAndWorldAndXAndYAndZ(
                         sep.getServer(), sep.getWorld(), sep.getX(), sep.getY(), sep.getZ());
         Sign sign = related.size() > 0 ? related.get(0) : null;
         SignEvent signEvent =

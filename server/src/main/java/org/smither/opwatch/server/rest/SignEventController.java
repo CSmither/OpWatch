@@ -6,6 +6,7 @@ import org.smither.opwatch.server.signEvents.SignEventService;
 import org.smither.opwatch.server.signs.SignService;
 import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -33,7 +34,7 @@ public class SignEventController {
                     @ApiResponse(code = 200, message = "Returned on successful call", response = SignEvent.class),
                     @ApiResponse(code = 403, message = "Forbidden - Login failed")
             })
-    //  @PreAuthorize("hasRole('SERVER')")
+    @PreAuthorize("hasRole('SERVER')")
     @PostMapping("/signEvent")
     public SignEvent postSignEvent(@RequestBody() SignEventPostDTO signEventPostDTO) {
         return signEventService.createSignEvent(signEventPostDTO);

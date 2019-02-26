@@ -1,8 +1,16 @@
 package org.smither.opwatch.utils;
 
 public enum SignChangeType {
-  suppress,
-  change,
-  wipe,
-  delete
+  CHANGE("changed"),
+  DELETE("deleted");
+
+  SignChangeType(String desc) {
+    this.desc = desc;
+  }
+
+  private String desc;
+
+  public String getDesc() {
+    return desc;
+  }
 }

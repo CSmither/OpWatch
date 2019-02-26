@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
+import org.smither.opwatch.utils.SignChangeReason;
 import org.smither.opwatch.utils.SignChangeType;
 import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
 import org.smither.opwatch.utils.sharedDTO.SignPostDTO;
@@ -33,8 +34,7 @@ public class RestController {
             sce.getBlock().getX(),
             sce.getBlock().getY(),
             sce.getBlock().getZ(),
-            sce.getBlock().getWorld().getName(),
-            false);
+            sce.getBlock().getWorld().getName());
       try {
           byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
           postRequest(new URL(Plugin.getInstance().getConfig().getString("serverUrl") + "/sign"), body);
@@ -43,7 +43,7 @@ public class RestController {
       }
   }
 
-  public void deleteSignFromServer(Block block, Player player) {
+  public void deleteSignFromServer(Block block, Player player, SignChangeType type, SignChangeReason reason) {
     SignEventPostDTO dto =
         new SignEventPostDTO(
             UUID.fromString(Plugin.getInstance().getConfig().getString("userID")),
@@ -52,9 +52,9 @@ public class RestController {
             block.getZ(),
             block.getWorld().getName(),
             LocalDateTime.now(),
-            SignChangeType.delete,
+            type,
             player.getUniqueId().toString(),
-            "Sign Destroyed",
+            reason,
             null,
             null,
             null,

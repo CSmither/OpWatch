@@ -8,7 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -46,12 +48,12 @@ public final class User implements UserDetails, Serializable {
     @JoinTable(name = "user_authority")
     private List<Authority> authorities;
 
-    public User(String username) {
+    User(String username) {
         this.username = username;
-        this.id=UUID.randomUUID();
+        this.id = UUID.randomUUID();
         setPassword("");
-        setAccountExpiry(LocalDateTime.of(9999,12,31,23,59,59,999));
-        setCredentialsExpiry(LocalDateTime.of(9999,12,31,23,59,59,999));
+        setAccountExpiry(LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999));
+        setCredentialsExpiry(LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999));
         setDisplayName(username);
         setEnabled(false);
         setLocked(false);
@@ -78,11 +80,15 @@ public final class User implements UserDetails, Serializable {
         return enabled;
     }
 
-    public void setPassword(String password) {
+    void setPassword(String password) {
         this.password = BCrypt.hashpw(password, BCrypt.gensalt(10));
     }
 
-    public void addAuthority(Authority authority) {
+    void addAuthority(Authority authority) {
         authorities.add(authority);
+    }
+
+    void delAuthority(Authority authority) {
+        authorities.remove(authority);
     }
 }

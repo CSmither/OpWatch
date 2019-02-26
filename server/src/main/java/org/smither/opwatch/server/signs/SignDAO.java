@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-interface SignDAO extends CrudRepository<Sign, UUID> {
+public interface SignDAO extends CrudRepository<Sign, UUID> {
 
     List<Sign> findByPlacer(UUID placer);
 
