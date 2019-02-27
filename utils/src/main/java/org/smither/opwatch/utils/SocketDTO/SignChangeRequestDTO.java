@@ -12,12 +12,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 public class SignChangeRequestDTO {
+  private UUID id;
   private int x;
   private int y;
   private int z;
   private UUID server;
   private String world;
+  private String actioner;
   private SignChangeType eventType;
+  private String reason;
   private String newLine1;
   private String newLine2;
   private String newLine3;

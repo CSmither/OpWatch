@@ -1,7 +1,6 @@
 package org.smither.opwatch.utils.sharedDTO;
 
 import lombok.*;
-import org.smither.opwatch.utils.SignChangeReason;
 import org.smither.opwatch.utils.SignChangeType;
 
 import java.time.LocalDateTime;
@@ -14,27 +13,29 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SignEventPostDTO {
 
-  private UUID server;
+    private UUID id;
 
-  private int x;
+    private UUID server;
 
-  private int y;
+    private int x;
 
-  private int z;
+    private int y;
 
-  private String world;
+    private int z;
 
-  private LocalDateTime dateTime;
+    private String world;
 
-  private SignChangeType eventType;
+    private LocalDateTime dateTime;
 
-  private String editor;
+    private SignChangeType eventType;
 
-  private SignChangeReason reason;
+    private String editor;
 
-  private String newLine1;
-  private String newLine2;
-  private String newLine3;
-  private String newLine4;
+    private String reason;
+
+    private String newLine1;
+    private String newLine2;
+    private String newLine3;
+    private String newLine4;
 
 }

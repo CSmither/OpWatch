@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
-import org.smither.opwatch.utils.SignChangeReason;
 import org.smither.opwatch.utils.SignChangeType;
+import org.smither.opwatch.utils.sharedDTO.ErrorDTO;
 import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
 import org.smither.opwatch.utils.sharedDTO.SignPostDTO;
 
@@ -20,71 +20,89 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class RestController {
-  public void sendSignToServer(SignChangeEvent sce) {
-    SignPostDTO dto =
-        new SignPostDTO(
-            sce.getLine(0),
-            sce.getLine(1),
-            sce.getLine(2),
-            sce.getLine(3),
-            LocalDateTime.now(),
-            sce.getPlayer().getUniqueId(),
-            UUID.randomUUID(),
-            UUID.fromString(Plugin.getInstance().getConfig().getString("userID")),
-            sce.getBlock().getX(),
-            sce.getBlock().getY(),
-            sce.getBlock().getZ(),
-            sce.getBlock().getWorld().getName());
-      try {
-          byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
-          postRequest(new URL(Plugin.getInstance().getConfig().getString("serverUrl") + "/sign"), body);
-      } catch (JsonProcessingException | MalformedURLException e1) {
-          e1.printStackTrace();
-      }
-  }
-
-  public void deleteSignFromServer(Block block, Player player, SignChangeType type, SignChangeReason reason) {
-    SignEventPostDTO dto =
-        new SignEventPostDTO(
-            UUID.fromString(Plugin.getInstance().getConfig().getString("userID")),
-            block.getX(),
-            block.getY(),
-            block.getZ(),
-            block.getWorld().getName(),
-            LocalDateTime.now(),
-            type,
-            player.getUniqueId().toString(),
-            reason,
-            null,
-            null,
-            null,
-            null);
-      try {
-          byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
-          postRequest(new URL(Plugin.getInstance().getConfig().getString("serverUrl") + "/signEvent"), body);
-      } catch (JsonProcessingException | MalformedURLException e1) {
-          e1.printStackTrace();
-      }
-  }
-
-  private int postRequest(URL url, byte[] body) {
-    try {
-      URLConnection con = url.openConnection();
-      HttpURLConnection http = (HttpURLConnection) con;
-      http.setRequestMethod("POST");
-      http.setDoOutput(true);
-      http.setFixedLengthStreamingMode(body.length);
-      http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-      http.connect();
-      try (OutputStream os = http.getOutputStream()) {
-        os.write(body);
-      } catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return http.getResponseCode();
-    } catch (IOException e1) {
-      e1.printStackTrace();
-      return -1;
+    public static void sendSignToServer(SignChangeEvent sce) {
+        SignPostDTO dto =
+                new SignPostDTO(
+                        sce.getLine(0),
+                        sce.getLine(1),
+                        sce.getLine(2),
+                        sce.getLine(3),
+                        LocalDateTime.now(),
+                        sce.getPlayer().getUniqueId(),
+                        UUID.randomUUID(),
+                        UUID.fromString(Plugin.getInstance().getConfig().getString("userID")),
+                        sce.getBlock().getX(),
+                        sce.getBlock().getY(),
+                        sce.getBlock().getZ(),
+                        sce.getBlock().getWorld().getName());
+        sendDto(dto);
     }
-  }
+
+    public static void deleteSignFromServer(Block block, Player player, SignChangeType type, String reason) {
+        SignEventPostDTO dto =
+                new SignEventPostDTO(
+                        UUID.randomUUID(),
+                        UUID.fromString(Plugin.getInstance().getConfig().getString("userID")),
+                        block.getX(),
+                        block.getY(),
+                        block.getZ(),
+                        block.getWorld().getName(),
+                        LocalDateTime.now(),
+                        type,
+                        player.getUniqueId().toString(),
+                        reason,
+                        null,
+                        null,
+                        null,
+                        null);
+        sendDto(dto);
+    }
+
+    public static void sendDto(SignPostDTO dto){
+        try {
+            byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
+            postRequest(new URL(Plugin.getInstance().getConfig().getString("serverURL") + "/sign"), body);
+        } catch (JsonProcessingException | MalformedURLException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public static void sendDto(ErrorDTO dto){
+        try {
+            byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
+            postRequest(new URL(Plugin.getInstance().getConfig().getString("serverURL") + "/problem"), body);
+        } catch (JsonProcessingException | MalformedURLException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public static void sendDto(SignEventPostDTO dto){
+        try {
+            byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
+            int httpResponseCode = postRequest(new URL(Plugin.getInstance().getConfig().getString("serverUrl") + "/signEvent"), body);
+        } catch (JsonProcessingException | MalformedURLException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    private static int postRequest(URL url, byte[] body) {
+        try {
+            URLConnection con = url.openConnection();
+            HttpURLConnection http = (HttpURLConnection) con;
+            http.setRequestMethod("POST");
+            http.setDoOutput(true);
+            http.setFixedLengthStreamingMode(body.length);
+            http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            http.connect();
+            try (OutputStream os = http.getOutputStream()) {
+                os.write(body);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            return http.getResponseCode();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            return -1;
+        }
+    }
 }

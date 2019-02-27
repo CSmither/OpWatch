@@ -8,9 +8,7 @@ import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -32,12 +30,11 @@ public final class Authority implements GrantedAuthority {
             },
             mappedBy = "authorities")
     @Setter
-    private List<User> users;
+    private Set<User> users = new HashSet<>();
 
     public Authority(String authority) {
         setAuthority(authority);
-        this.users = new ArrayList<>();
-        this.id=UUID.randomUUID();
+        id=UUID.randomUUID();
     }
 
     public void setAuthority(String authority) {

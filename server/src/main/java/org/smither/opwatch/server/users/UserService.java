@@ -23,7 +23,8 @@ public class UserService {
             User user = new User("admin");
             user.setPassword("admin");
             user.setEnabled(true);
-            user.addAuthority(createAuthority("ADMIN"));
+            Authority admin=createAuthority("ADMIN");
+            user.addAuth(admin);
             userDAO.save(user);
         }
     }
@@ -38,11 +39,17 @@ public class UserService {
     public void addauthority(UUID userId, UUID authId) {
         Optional<User> optUser = userDAO.findById(userId);
         Optional<Authority> optAuth = authDAO.findById(authId);
-        if (optUser.isEmpty() || optAuth.isEmpty()) {
+        if (optUser.isEmpty()) {
             throw new MissingResourceException(String.format("User %s not found", userId), User.class.getName(), userId.toString());
         }
+        if (optAuth.isEmpty()) {
+            throw new MissingResourceException(String.format("Authority %s not found", authId), Authority.class.getName(), authId.toString());
+        }
+        Authority auth = optAuth.get();
         User user = optUser.get();
-        user.addAuthority(optAuth.get());
+        user.getAuthorities().add(optAuth.get());
+        auth.getUsers().add(user);
+        authDAO.save(auth);
         userDAO.save(user);
     }
 
