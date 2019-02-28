@@ -1,20 +1,14 @@
 package org.smither.opwatch.server.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.smither.opwatch.server.auth.JwtTokenProvider;
 import org.smither.opwatch.server.users.UserService;
 import org.smither.opwatch.utils.sharedDTO.CreateAuthDTO;
 import org.smither.opwatch.utils.sharedDTO.RegisterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @RestController
@@ -35,7 +29,9 @@ public class UserController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @ApiOperation(value = "Registers a new user")
+    @ApiOperation(value = "Registers a new user",
+            authorizations = {@Authorization(value = "jwtAuth")}
+    )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Never returned but swagger won't let me get rid of it"),
             @ApiResponse(code = 201, message = "User successfully registered"),
@@ -49,7 +45,9 @@ public class UserController {
         userService.createUser(registerDTO.getUsername(), registerDTO.getPassword());
     }
 
-    @ApiOperation(value = "Adds an auth to a user")
+    @ApiOperation(value = "Adds an auth to a user",
+            authorizations = {@Authorization(value = "jwtAuth")}
+    )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Never returned but swagger won't let me get rid of it"),
             @ApiResponse(code = 201, message = "Authority successfully added to user"),
@@ -62,7 +60,9 @@ public class UserController {
         userService.addauthority(userId, authId);
     }
 
-    @ApiOperation(value = "Removes an auth from a user")
+    @ApiOperation(value = "Removes an auth from a user",
+            authorizations = {@Authorization(value = "jwtAuth")}
+    )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Never returned but swagger won't let me get rid of it"),
             @ApiResponse(code = 201, message = "Authority successfully added to user"),
@@ -75,7 +75,9 @@ public class UserController {
         userService.delAuthority(userId, authId);
     }
 
-    @ApiOperation(value = "Registers a new authority")
+    @ApiOperation(value = "Registers a new authority",
+            authorizations = {@Authorization(value = "jwtAuth")}
+    )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Never returned but swagger won't let me get rid of it"),
             @ApiResponse(code = 201, message = "Authority successfully registered"),
