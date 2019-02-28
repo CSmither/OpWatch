@@ -8,8 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -43,10 +43,9 @@ public final class User implements UserDetails, Serializable {
 
     private boolean enabled;
 
-    @NonNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authority")
-    private List<Authority> authorities;
+    private Set<Authority> authorities = new HashSet<>();
 
     User(String username) {
         this.username = username;
@@ -57,7 +56,6 @@ public final class User implements UserDetails, Serializable {
         setDisplayName(username);
         setEnabled(false);
         setLocked(false);
-        setAuthorities(Collections.emptyList());
     }
 
     @Override
@@ -80,12 +78,22 @@ public final class User implements UserDetails, Serializable {
         return enabled;
     }
 
-    void setPassword(String password) {
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt(10));
+    private void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
-    void addAuthority(Authority authority) {
+    public void addAuth(Authority authority) {
         authorities.add(authority);
+        authority.getUsers().add(this);
+    }
+
+    public void removeAuth(Authority authority) {
+        authorities.remove(authority);
+        authority.getUsers().remove(this);
+    }
+
+    void setPassword(String password) {
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt(10));
     }
 
     void delAuthority(Authority authority) {

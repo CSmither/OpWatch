@@ -9,11 +9,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class SocketUserAuthenticator {
-    private Map<SocketIOClient, Authentication> socketId = new HashMap<>();
-    private Map<User, SocketIOClient> userSockets = new HashMap<>();
+    private Map<UUID, Authentication> socketId = new HashMap<>();
+    private Map<UUID, SocketIOClient> userSockets = new HashMap<>();
 
     private AuthService authService;
 
@@ -22,10 +23,15 @@ public class SocketUserAuthenticator {
         this.authService = authService;
     }
 
-    public void login(SocketIOClient client, String token) {
+    User login(SocketIOClient client, String token) {
         Authentication auth = authService.getPrinciple(token);
-        socketId.put(client, auth);
-        userSockets.put((User) auth.getPrincipal(), client);
+        socketId.put(client.getSessionId(), auth);
+        userSockets.put(((User) auth.getPrincipal()).getId(), client);
         client.set("user", auth.getPrincipal());
+        return (User) auth.getPrincipal();
+    }
+
+    SocketIOClient getClientForId(UUID server) {
+        return userSockets.get(server);
     }
 }

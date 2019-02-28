@@ -37,7 +37,7 @@ public class SignEventService {
         SignEvent signEvent =
                 signEventDAO.save(
                         new SignEvent(
-                                UUID.randomUUID(),
+                                sep.getId(),
                                 sep.getEventType(),
                                 sep.getNewLine1(),
                                 sep.getNewLine2(),

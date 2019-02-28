@@ -12,12 +12,8 @@ import java.io.IOException;
 public class RootController {
 
   @GetMapping("/")
-  public void index( HttpServletResponse response) {
-    try {
+  public void index( HttpServletResponse response) throws IOException {
       response.sendRedirect("/swagger-ui.html#/");
-    } catch (IOException e) {
-      return;
-    }
   }
 
 }

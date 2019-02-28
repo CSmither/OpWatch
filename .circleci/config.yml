@@ -33,13 +33,15 @@ jobs:
           message: "Deploying services"
       - add_ssh_keys:
           fingerprints:
-            - "8d:1b:63:5b:c4:a8:3d:c2:ae:b2:90:ff:15:95:2e:37"
-      - run: ssh gameserv@:smither.org "\
-                cd ~/games/minecraft/opwatch-develop/docker-compose && \
-                git fetch && git reset --hard origin/develop \
-                docker-compose kill -f \
-                docker-compose rm -f \
-                docker-compose up -d"
+            - "8a:1f:2c:bc:72:b9:ff:e8:a5:04:a1:1d:e6:67:e5:19"
+      - run: ssh-keyscan -H smither.org >> ~/.ssh/known_hosts
+      - run: ssh gameserv@smither.org "
+                cd ~/games/minecraft/opwatch-develop/docker-compose &&
+                git fetch && git reset --hard origin/develop &&
+                docker-compose kill &&
+                docker-compose rm -f &&
+                docker-compose pull &&
+                docker-compose -p opwatch_dev up -d "
       - slack/notify:
                message: "Services deployed on smither.org:8888 and smither.org:25570"
     
@@ -56,16 +58,12 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/opwatch
-      - run:
-          name: Get Version
-          command: |
-            VERSION=$(cat ~/opwatch/.version)
       - slack/approval:
-          message: "Hey, any chance of approval to release $VERSION on $CIRCLE_PROJECT_REPONAME?"
+          message: "Hey, any chance of approval to release $(cat ~/opwatch/.version) on $CIRCLE_PROJECT_REPONAME?"
     
   server_build:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11-jdk-node-browsers
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -87,7 +85,7 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: gradle build
+      - run: gradle build -x test
       - run: gradle bootJar
       - persist_to_workspace:
           root: ~/opwatch
@@ -124,7 +122,7 @@ jobs:
             docker push $REGISTRY:$RELEASE-$VERSION
             docker push $REGISTRY:$RELEASE
       - slack/notify:
-          message: "${CIRCLE_PROJECT_REPONAME} v$VERSION server released on docker hub"
+          message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) server released on docker hub"
   server_github_release:
     docker:
       - image: cibuilds/github:0.10
@@ -141,7 +139,7 @@ jobs:
             zip ./artifacts/server-$VERSION.zip ./artifacts/server ./artifacts/.version
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/*.zip
       - slack/notify:
-          message: "${CIRCLE_PROJECT_REPONAME} v$VERSION released on github"
+          message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) released on github"
   server_test:
     docker:
       - image: circleci/openjdk:11-jdk
@@ -171,11 +169,10 @@ jobs:
       - slack/status
   spigot_build:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11-jdk-node-browsers
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
-      TERM: dumb
     steps:
       - checkout:
           path: ~/opwatch
@@ -193,8 +190,8 @@ jobs:
           paths:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-      - run: gradle build
-      - run: gradle jar
+      - run: gradle build -x test
+      - run: gradle shadowJar
       - persist_to_workspace:
           root: ~/opwatch
           paths:
@@ -229,7 +226,7 @@ jobs:
             docker push $REGISTRY:$RELEASE-$VERSION
             docker push $REGISTRY:$RELEASE
       - slack/notify:
-          message: "${CIRCLE_PROJECT_REPONAME} v$VERSION spigot released on docker hub"
+          message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) spigot released on docker hub"
   spigot_test:
     docker:
       - image: circleci/openjdk:11-jdk
