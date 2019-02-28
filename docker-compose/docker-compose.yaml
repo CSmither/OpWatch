@@ -3,7 +3,7 @@ services:
   spigot:
     image: smither/opwatch-spigot:testing
     ports:
-      - "25570:25565"
+      - "25575:25565"
     volumes:
       - ./configs/opwatch.yml:/spigot/plugins/opwatch/config.yml
     env_file:

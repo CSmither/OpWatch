@@ -7,6 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 public class Plugin extends JavaPlugin {
@@ -18,13 +20,27 @@ public class Plugin extends JavaPlugin {
     @Override
     public void onLoad() {
         setInstance(this);
+        if (!this.getDataFolder().exists()) {
+            this.getDataFolder().mkdir();
+        }
+        try {
+            if (this.getResource("config.yml") == null || this.getResource("config.yml").available() == 0) {
+                this.saveDefaultConfig();
+            }
+        } catch (IOException e) {
+            getLogger().warning(e.getMessage());
+            this.saveDefaultConfig();
+        }
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+        this.saveConfig();
+    }
 
     @Override
-    public void onEnable() {}
+    public void onEnable() {
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -33,7 +49,7 @@ public class Plugin extends JavaPlugin {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return null;
+        return Collections.emptyList();
     }
 
 }
