@@ -63,7 +63,7 @@ jobs:
     
   server_build:
     docker:
-      - image: circleci/openjdk:11-jdk-node-browsers
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -142,7 +142,7 @@ jobs:
           message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) released on github"
   server_test:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -169,7 +169,7 @@ jobs:
       - slack/status
   spigot_build:
     docker:
-      - image: circleci/openjdk:11-jdk-node-browsers
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
@@ -229,7 +229,7 @@ jobs:
           message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) spigot released on docker hub"
   spigot_test:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
