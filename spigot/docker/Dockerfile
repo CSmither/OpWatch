@@ -2,7 +2,7 @@ FROM openjdk:11-jre-slim
 
 EXPOSE 25565
 WORKDIR /spigot
-RUN echo "eula=false" > /spigot/eula.txt
+RUN echo "eula=true" > /spigot/eula.txt
 RUN mkdir /spigot/plugins
 RUN mkdir /spigot/plugins/opwatch
 ADD https://cdn.getbukkit.org/spigot/spigot-1.13.2.jar /spigot/spigot.jar
