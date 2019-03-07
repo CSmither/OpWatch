@@ -9,8 +9,8 @@ steps:
       docker_layer_caching: true
   - run:
       name: Build Docker image
-      working_directory: ~/opwatch/spigot/docker
-      command: docker build -t $REGISTRY:$CIRCLE_SHA1 .
+      working_directory: ~/opwatch/spigot
+      command: docker build -t $REGISTRY:$CIRCLE_SHA1 -f docker/Dockerfile .
   - run:
       name: Push docker image to docker hub
       command: |

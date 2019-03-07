@@ -25,6 +25,6 @@ steps:
   - persist_to_workspace:
       root: ~/opwatch
       paths:
-        - spigot/Dockerfile
+        - spigot/docker
         - spigot/build/libs
         - spigot/build/resources
