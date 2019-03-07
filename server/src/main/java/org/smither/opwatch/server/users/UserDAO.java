@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 interface UserDAO extends CrudRepository<User, UUID> {
     List<User> findByUsername(String username);
+    List<User> findAll();
 }

@@ -23,7 +23,7 @@ public class UserService {
             User user = new User("admin");
             user.setPassword("admin");
             user.setEnabled(true);
-            Authority admin=createAuthority("ROLE_ADMIN");
+            Authority admin = createAuthority("ROLE_ADMIN");
             user.addAuth(admin);
             userDAO.save(user);
         }
@@ -59,6 +59,13 @@ public class UserService {
 
     public Optional<User> findById(UUID id) {
         return userDAO.findById(id);
+    }
+
+    public List<User> findAll() {
+        return userDAO.findAll();
+    }
+    public List<Authority> findAllAuths() {
+        return authDAO.findAll();
     }
 
     public List<User> findByUsername(String username) {
