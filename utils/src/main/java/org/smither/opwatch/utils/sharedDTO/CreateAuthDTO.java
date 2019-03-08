@@ -1,11 +1,10 @@
 package org.smither.opwatch.utils.sharedDTO;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class CreateAuthDTO {
     @NonNull
     private String authority;
