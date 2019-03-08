@@ -95,7 +95,6 @@ public class RestController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         } catch (URISyntaxException | JsonProcessingException e) {
             e.printStackTrace();
         }

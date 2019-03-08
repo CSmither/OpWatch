@@ -52,10 +52,14 @@ public class AuthManager {
     }
 
     private void refreshToken() {
+        LoginDTO dto;
         if (tokenIsValid(refreshToken)) {
-            TokenReturnDTO tokens = RestController.sendDto(LoginDTO.builder().refresh(refreshToken).build());
-            refreshToken = tokens.getRefresh();
-            token = tokens.getAccess();
+            dto = LoginDTO.builder().refresh(refreshToken).build();
+        } else {
+            dto = LoginDTO.builder().username(username).password(password).build();
         }
+        TokenReturnDTO tokens = RestController.sendDto(dto);
+        refreshToken = tokens.getRefresh();
+        token = tokens.getAccess();
     }
 }
