@@ -43,7 +43,7 @@ public class UserController {
             @ApiResponse(code = 401, message = "Invalid username / password"),
             @ApiResponse(code = 409, message = "User exists")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/user")
     public List<UserReturnDTO> getUsers() {
         return userService.findAll().stream()
@@ -70,7 +70,7 @@ public class UserController {
             @ApiResponse(code = 401, message = "Invalid username / password"),
             @ApiResponse(code = 409, message = "User exists")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/auth")
     public List<AuthReturnDTO> getAuths() {
         return userService.findAllAuths().stream()
@@ -91,7 +91,7 @@ public class UserController {
             @ApiResponse(code = 401, message = "Invalid username / password"),
             @ApiResponse(code = 409, message = "User exists")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/user")
     public void register(@RequestBody RegisterDTO registerDTO) {
         userService.createUser(registerDTO.getUsername(), registerDTO.getPassword());
@@ -106,7 +106,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Invalid parameters"),
             @ApiResponse(code = 401, message = "Invalid UserId / AuthId")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/user/{userId}/auth/{authId}")
     public void addAuth(@PathVariable("userId") UUID userId, @PathVariable("authId") UUID authId) {
         userService.addauthority(userId, authId);
@@ -121,7 +121,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Invalid parameters"),
             @ApiResponse(code = 401, message = "Invalid UserId / AuthId")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/user/{userId}/auth/{authId}")
     public void removeAuth(@PathVariable("userId") UUID userId, @PathVariable("authId") UUID authId) {
         userService.delAuthority(userId, authId);
@@ -136,7 +136,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Invalid parameters"),
             @ApiResponse(code = 409, message = "Authority exists")
     })
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/authority")
     public void createAuthority(@RequestBody CreateAuthDTO createAuthDTO) {
         userService.createAuthority(createAuthDTO.getAuthority());

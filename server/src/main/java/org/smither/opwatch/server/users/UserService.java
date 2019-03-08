@@ -23,7 +23,7 @@ public class UserService {
             User user = new User("admin");
             user.setPassword("admin");
             user.setEnabled(true);
-            Authority admin = createAuthority("ROLE_ADMIN");
+            Authority admin = createAuthority("ADMIN");
             user.addAuth(admin);
             userDAO.save(user);
         }
