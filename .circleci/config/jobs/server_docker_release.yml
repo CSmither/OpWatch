@@ -20,7 +20,6 @@ steps:
         docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION
         docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE
         [[ $CIRCLE_BRANCH = "master" ]] && docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:latest
-#        docker push $REGISTRY:$CIRCLE_SHA1
         docker push $REGISTRY:$RELEASE-$VERSION
         docker push $REGISTRY:$RELEASE
   - slack/notify:
