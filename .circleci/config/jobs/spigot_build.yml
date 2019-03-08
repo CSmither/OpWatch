@@ -28,3 +28,5 @@ steps:
         - spigot/docker
         - spigot/build/libs
         - spigot/build/resources
+  - slack/status:
+      fail_only: 'true'

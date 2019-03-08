@@ -23,4 +23,5 @@ steps:
       destination: build_reports
   - store_test_results:
       path: build/test-results
-  - slack/status
+  - slack/status:
+      fail_only: 'true'

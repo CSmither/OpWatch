@@ -30,3 +30,5 @@ steps:
         - server/build/libs
         - server/build/resources
         - .version
+  - slack/status:
+      fail_only: 'true'
