@@ -61,5 +61,6 @@ public class AuthManager {
         TokenReturnDTO tokens = RestController.sendDto(dto);
         refreshToken = tokens.getRefresh();
         token = tokens.getAccess();
+        Plugin.getInstance().getLogger().info("New Token Fetched for OpWatch");
     }
 }
