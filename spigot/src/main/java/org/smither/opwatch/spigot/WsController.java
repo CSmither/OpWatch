@@ -1,7 +1,5 @@
 package org.smither.opwatch.spigot;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import org.json.JSONException;
@@ -10,7 +8,6 @@ import org.smither.opwatch.utils.SocketDTO.EventAck;
 import org.smither.opwatch.utils.SocketDTO.EventTypes;
 import org.smither.opwatch.utils.SocketDTO.SignChangeRequestDTO;
 import org.smither.opwatch.utils.Success;
-import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
 
 import java.net.URISyntaxException;
 
