@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class RestController {
     public static void sendSignToServer(SignChangeEvent sce) {
@@ -62,8 +63,8 @@ public class RestController {
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
             postRequest(new URI(Plugin.getInstance().getConfig().getString("serverURL") + "/sign"), body, AuthManager.get().getToken());
-        } catch (JsonProcessingException | URISyntaxException e1) {
-            e1.printStackTrace();
+        } catch (JsonProcessingException | URISyntaxException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting SignPostDTO", e);
         }
     }
 
@@ -71,8 +72,8 @@ public class RestController {
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
             postRequest(new URI(Plugin.getInstance().getConfig().getString("serverURL") + "/problem"), body, AuthManager.get().getToken());
-        } catch (JsonProcessingException | URISyntaxException e1) {
-            e1.printStackTrace();
+        } catch (JsonProcessingException | URISyntaxException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting ErrorDTO", e);
         }
     }
 
@@ -80,8 +81,8 @@ public class RestController {
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
             postRequest(new URI(Plugin.getInstance().getConfig().getString("serverUrl") + "/signEvent"), body, AuthManager.get().getToken());
-        } catch (JsonProcessingException | URISyntaxException e1) {
-            e1.printStackTrace();
+        } catch (JsonProcessingException | URISyntaxException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting SignEventDTO", e);
         }
     }
 
@@ -93,15 +94,15 @@ public class RestController {
             try {
                 return mapper.readValue(returned, TokenReturnDTO.class);
             } catch (IOException e) {
-                e.printStackTrace();
+                Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
             }
         } catch (URISyntaxException | JsonProcessingException e) {
-            e.printStackTrace();
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
         }
         return null;
     }
 
-    private static byte[] postRequest(URI url, byte[] body, String token) throws URISyntaxException {
+    private static byte[] postRequest(URI url, byte[] body, String token) {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
@@ -109,12 +110,12 @@ public class RestController {
         try {
             response = client.execute(request);
         } catch (IOException e) {
-            e.printStackTrace();
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting a DTO", e);
         }
         try {
             return response.getEntity().getContent().readAllBytes();
         } catch (IOException e) {
-            e.printStackTrace();
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
         }
         return new byte[0];
     }
