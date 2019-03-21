@@ -10,6 +10,7 @@ import java.util.UUID;
 @Repository
 interface AuthorityDAO extends CrudRepository<Authority, Long> {
     Optional<Authority> findById(UUID id);
+    List<Authority> findAll();
 
     List<Authority> findByAuthority(String authority);
 

@@ -1,8 +1,6 @@
 docker:
   - image: circleci/python
 steps:
-  - slack/notify:
-      message: "Deploying services"
   - add_ssh_keys:
       fingerprints:
         - "8a:1f:2c:bc:72:b9:ff:e8:a5:04:a1:1d:e6:67:e5:19"

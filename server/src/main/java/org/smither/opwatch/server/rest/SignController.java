@@ -1,6 +1,7 @@
 package org.smither.opwatch.server.rest;
 
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.smither.opwatch.server.signEvents.SignEvent;
 import org.smither.opwatch.server.signEvents.SignEventService;
 import org.smither.opwatch.server.signs.Sign;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @Api(value = "Signs", description = "Operations pertaining to Signs")
+@Slf4j
 public class SignController {
 
     private final SignService signService;

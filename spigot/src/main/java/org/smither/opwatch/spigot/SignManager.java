@@ -78,6 +78,7 @@ public class SignManager {
                     .z(dto.getZ())
                     .build());
         } catch (Exception ex) {
+            Plugin.getInstance().getLogger().warning(String.format("Sign change request FAILED due to an exception, %s", ex.getMessage()));
             RestController.sendDto(
                     ErrorDTO.builder()
                             .message(String.format("Sign change request FAILED due to an exception, %s", ex.getMessage()))

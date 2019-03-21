@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@1.0.0
+  slack: circleci/slack@2.0.0
 
 jobs: 
   check_circle_config:
@@ -29,8 +29,6 @@ jobs:
     docker:
       - image: circleci/python
     steps:
-      - slack/notify:
-          message: "Deploying services"
       - add_ssh_keys:
           fingerprints:
             - "8a:1f:2c:bc:72:b9:ff:e8:a5:04:a1:1d:e6:67:e5:19"
@@ -63,7 +61,7 @@ jobs:
     
   server_build:
     docker:
-      - image: circleci/openjdk:11-jdk-node-browsers
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -94,6 +92,8 @@ jobs:
             - server/build/libs
             - server/build/resources
             - .version
+      - slack/status:
+          fail_only: 'true'
     
   server_docker_release:
     docker:
@@ -118,7 +118,6 @@ jobs:
             docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION
             docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE
             [[ $CIRCLE_BRANCH = "master" ]] && docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:latest
-            docker push $REGISTRY:$CIRCLE_SHA1
             docker push $REGISTRY:$RELEASE-$VERSION
             docker push $REGISTRY:$RELEASE
       - slack/notify:
@@ -142,7 +141,7 @@ jobs:
           message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) released on github"
   server_test:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -166,10 +165,11 @@ jobs:
           destination: build_reports
       - store_test_results:
           path: build/test-results
-      - slack/status
+      - slack/status:
+          fail_only: 'true'
   spigot_build:
     docker:
-      - image: circleci/openjdk:11-jdk-node-browsers
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
@@ -198,6 +198,8 @@ jobs:
             - spigot/docker
             - spigot/build/libs
             - spigot/build/resources
+      - slack/status:
+          fail_only: 'true'
     
   spigot_docker_release:
     docker:
@@ -222,14 +224,13 @@ jobs:
             docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE-$VERSION
             docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:$RELEASE
             [[ $CIRCLE_BRANCH = "master" ]] && docker tag $REGISTRY:$CIRCLE_SHA1 $REGISTRY:latest
-            docker push $REGISTRY:$CIRCLE_SHA1
             docker push $REGISTRY:$RELEASE-$VERSION
             docker push $REGISTRY:$RELEASE
       - slack/notify:
           message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) spigot released on docker hub"
   spigot_test:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:11.0.2-jdk-stretch
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
@@ -253,7 +254,8 @@ jobs:
           destination: build_reports
       - store_test_results:
           path: build/test-results
-      - slack/status
+      - slack/status:
+          fail_only: 'true'
   
 
 workflows: 

@@ -25,8 +25,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +68,7 @@ public class JwtTokenProvider {
                     .withIssuer(iss)
                     .withAudience(iss)
                     .withSubject(id.toString())
-                    .withExpiresAt(Date.from(LocalDateTime.now().plusMinutes(30).toInstant(ZoneOffset.UTC)))
+                    .withExpiresAt(new Date(new Date().getTime()+900000))
                     .withClaim("type", "access")
                     .sign(algorithm);
             String refresh = JWT.create()
@@ -78,7 +76,7 @@ public class JwtTokenProvider {
                     .withIssuer(iss)
                     .withAudience(iss)
                     .withSubject(id.toString())
-                    .withExpiresAt(Date.from(LocalDateTime.now().plusDays(21).toInstant(ZoneOffset.UTC)))
+                    .withExpiresAt(new Date(new Date().getTime()+1814400000	))
                     .withClaim("type", "refresh")
                     .sign(algorithm);
             DecodedJWT jwt = JWT.decode(refresh);

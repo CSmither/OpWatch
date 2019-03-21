@@ -2,22 +2,23 @@ package org.smither.opwatch.spigot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.smither.opwatch.utils.SignChangeType;
-import org.smither.opwatch.utils.sharedDTO.ErrorDTO;
-import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
-import org.smither.opwatch.utils.sharedDTO.SignPostDTO;
+import org.smither.opwatch.utils.sharedDTO.*;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class RestController {
     public static void sendSignToServer(SignChangeEvent sce) {
@@ -58,51 +59,64 @@ public class RestController {
         sendDto(dto);
     }
 
-    public static void sendDto(SignPostDTO dto){
+    public static void sendDto(SignPostDTO dto) {
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
-            postRequest(new URL(Plugin.getInstance().getConfig().getString("serverURL") + "/sign"), body);
-        } catch (JsonProcessingException | MalformedURLException e1) {
-            e1.printStackTrace();
+            postRequest(new URI(Plugin.getInstance().getConfig().getString("serverURL") + "/sign"), body, AuthManager.get().getToken());
+        } catch (JsonProcessingException | URISyntaxException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting SignPostDTO", e);
         }
     }
 
-    public static void sendDto(ErrorDTO dto){
+    public static void sendDto(ErrorDTO dto) {
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
-            postRequest(new URL(Plugin.getInstance().getConfig().getString("serverURL") + "/problem"), body);
-        } catch (JsonProcessingException | MalformedURLException e1) {
-            e1.printStackTrace();
+            postRequest(new URI(Plugin.getInstance().getConfig().getString("serverURL") + "/problem"), body, AuthManager.get().getToken());
+        } catch (JsonProcessingException | URISyntaxException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting ErrorDTO", e);
         }
     }
 
-    public static void sendDto(SignEventPostDTO dto){
+    public static void sendDto(SignEventPostDTO dto) {
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
-            int httpResponseCode = postRequest(new URL(Plugin.getInstance().getConfig().getString("serverUrl") + "/signEvent"), body);
-        } catch (JsonProcessingException | MalformedURLException e1) {
-            e1.printStackTrace();
+            postRequest(new URI(Plugin.getInstance().getConfig().getString("serverUrl") + "/signEvent"), body, AuthManager.get().getToken());
+        } catch (JsonProcessingException | URISyntaxException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting SignEventDTO", e);
         }
     }
 
-    private static int postRequest(URL url, byte[] body) {
+    public static TokenReturnDTO sendDto(LoginDTO dto) {
         try {
-            URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection) con;
-            http.setRequestMethod("POST");
-            http.setDoOutput(true);
-            http.setFixedLengthStreamingMode(body.length);
-            http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            http.connect();
-            try (OutputStream os = http.getOutputStream()) {
-                os.write(body);
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
+            byte[] returned = postRequest(new URI(Plugin.getInstance().getConfig().getString("serverUrl") + "/token"), body, "");
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                return mapper.readValue(returned, TokenReturnDTO.class);
+            } catch (IOException e) {
+                Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
             }
-            return http.getResponseCode();
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            return -1;
+        } catch (URISyntaxException | JsonProcessingException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
         }
+        return null;
+    }
+
+    private static byte[] postRequest(URI url, byte[] body, String token) {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(url);
+        request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        HttpResponse response = null;
+        try {
+            response = client.execute(request);
+        } catch (IOException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting a DTO", e);
+        }
+        try {
+            return response.getEntity().getContent().readAllBytes();
+        } catch (IOException e) {
+            Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
+        }
+        return new byte[0];
     }
 }
