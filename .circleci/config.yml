@@ -43,6 +43,13 @@ jobs:
       - slack/notify:
                message: "Services deployed on smither.org:8888 and smither.org:25570"
     
+  deploy_server:
+    docker:
+      - image: circleci/python
+    steps:
+      - slack/notify:
+          message: "Deploy not yet implemented. Just do it!"
+    
   notify_start:
     docker:
       - image: circleci/python
@@ -61,7 +68,7 @@ jobs:
     
   server_build:
     docker:
-      - image: circleci/openjdk:11.0.2-jdk-stretch
+      - image: circleci/openjdk:8-jdk-stretch
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -141,7 +148,7 @@ jobs:
           message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) released on github"
   server_test:
     docker:
-      - image: circleci/openjdk:11.0.2-jdk-stretch
+      - image: circleci/openjdk:8-jdk-stretch
     working_directory: ~/opwatch/server
     environment:
       JVM_OPTS: -Xmx3200m
@@ -169,7 +176,7 @@ jobs:
           fail_only: 'true'
   spigot_build:
     docker:
-      - image: circleci/openjdk:11.0.2-jdk-stretch
+      - image: circleci/openjdk:8-jdk-stretch
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
@@ -230,7 +237,7 @@ jobs:
           message: "${CIRCLE_PROJECT_REPONAME} v$(cat ~/opwatch/.version) spigot released on docker hub"
   spigot_test:
     docker:
-      - image: circleci/openjdk:11.0.2-jdk-stretch
+      - image: circleci/openjdk:8-jdk-stretch
     working_directory: ~/opwatch/spigot
     environment:
       JVM_OPTS: -Xmx3200m
@@ -315,6 +322,57 @@ workflows:
           requires:
             - server_docker_release
             - spigot_docker_release
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - server_github_release:
+          requires:
+            - release_approval
+          filters:
+            branches:
+              only: master
+  server:
+    jobs:
+      - check_circle_config
+      - notify_start:
+          requires:
+            - check_circle_config
+      - server_build:
+          requires:
+            - notify_start
+      - server_test:
+          requires:
+            - server_build
+      - request_approval:
+          requires:
+            - server_test
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - release_approval:
+          type: approval
+          requires:
+            - request_approval
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - server_docker_release:
+          requires:
+            - release_approval
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - deploy_server:
+          requires:
+            - server_docker_release
           filters:
             branches:
               only:
