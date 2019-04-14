@@ -1,0 +1,50 @@
+jobs:
+  - check_circle_config
+  - notify_start:
+      requires:
+        - check_circle_config
+  - server_build:
+      requires:
+        - notify_start
+  - server_test:
+      requires:
+        - server_build
+  - request_approval:
+      requires:
+        - server_test
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - release_approval:
+      type: approval
+      requires:
+        - request_approval
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - server_docker_release:
+      requires:
+        - release_approval
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - deploy_server:
+      requires:
+        - server_docker_release
+      filters:
+        branches:
+          only:
+            - develop
+            - master
+  - server_github_release:
+      requires:
+        - release_approval
+      filters:
+        branches:
+          only: master
