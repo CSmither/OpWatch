@@ -5,7 +5,7 @@ WORKDIR /spigot
 RUN echo "eula=true" > /spigot/eula.txt
 RUN mkdir /spigot/plugins
 RUN mkdir /spigot/plugins/opwatch
-ADD https://cdn.getbukkit.org/spigot/spigot-1.13.2.jar /spigot/spigot.jar
+ADD https://cdn.getbukkit.org/spigot/spigot-1.12.1.jar /spigot/spigot.jar
 COPY ./docker/config/server.properties /spigot/server.properties
 COPY ./build/libs/opwatch-spigot-*.jar /spigot/plugins/
 
