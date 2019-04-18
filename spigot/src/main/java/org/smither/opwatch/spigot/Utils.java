@@ -3,6 +3,7 @@ package org.smither.opwatch.spigot;
 import com.google.common.collect.Sets;
 import org.bukkit.Material;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Utils {
@@ -15,6 +16,6 @@ public class Utils {
                     Material.LEGACY_SIGN_POST);
 
     public static Set<Material> getSignSet() {
-        return Set.copyOf(signSet);
+        return new HashSet<>(signSet);
     }
 }

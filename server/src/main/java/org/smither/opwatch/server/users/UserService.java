@@ -39,10 +39,10 @@ public class UserService {
     public void addauthority(UUID userId, UUID authId) {
         Optional<User> optUser = userDAO.findById(userId);
         Optional<Authority> optAuth = authDAO.findById(authId);
-        if (optUser.isEmpty()) {
+        if (!optUser.isPresent()) {
             throw new MissingResourceException(String.format("User %s not found", userId), User.class.getName(), userId.toString());
         }
-        if (optAuth.isEmpty()) {
+        if (!optAuth.isPresent()) {
             throw new MissingResourceException(String.format("Authority %s not found", authId), Authority.class.getName(), authId.toString());
         }
         Authority auth = optAuth.get();
@@ -75,7 +75,7 @@ public class UserService {
     public void delAuthority(UUID userId, UUID authId) {
         Optional<User> optUser = userDAO.findById(userId);
         Optional<Authority> optAuth = authDAO.findById(authId);
-        if (optUser.isEmpty() || optAuth.isEmpty()) {
+        if (!(optUser.isPresent() && optAuth.isPresent())) {
             throw new MissingResourceException(String.format("User %s not found", userId), User.class.getName(), userId.toString());
         }
         User user = optUser.get();

@@ -11,9 +11,7 @@ import org.smither.opwatch.utils.sharedDTO.ErrorDTO;
 import org.smither.opwatch.utils.sharedDTO.SignEventPostDTO;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class SignManager {
     private static Set<Material> signMat = Utils.getSignSet();
@@ -52,7 +50,7 @@ public class SignManager {
                 case OP_WIPE:
                 case OP_CHANGE:
                     changeSign(dto.getWorld(), dto.getX(), dto.getY(), dto.getZ(),
-                            List.of(dto.getNewLine1(), dto.getNewLine2(), dto.getNewLine3(), dto.getNewLine4()));
+                            Arrays.asList(dto.getNewLine1(), dto.getNewLine2(), dto.getNewLine3(), dto.getNewLine4()));
                     break;
                 case OP_DESTROY:
                 case PLAYER_DESTROY:

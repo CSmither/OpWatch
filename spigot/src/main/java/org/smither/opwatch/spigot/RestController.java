@@ -2,6 +2,7 @@ package org.smither.opwatch.spigot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -113,7 +114,7 @@ public class RestController {
             Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting a DTO", e);
         }
         try {
-            return response.getEntity().getContent().readAllBytes();
+            return IOUtils.toByteArray(response.getEntity().getContent());
         } catch (IOException e) {
             Plugin.getInstance().getLogger().log(Level.WARNING, "Error whilst posting LoginDTO", e);
         }
