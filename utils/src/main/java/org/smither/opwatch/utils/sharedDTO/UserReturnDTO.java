@@ -2,9 +2,9 @@ package org.smither.opwatch.utils.sharedDTO;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Singular;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,5 +18,6 @@ public class UserReturnDTO {
     private String displayName;
     private boolean locked;
     private boolean enabled;
-    private Map<UUID, String> authorities = new HashMap<>();
+    @Singular(value = "authority")
+    private Map<UUID, String> authorities;
 }
