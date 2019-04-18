@@ -36,6 +36,15 @@ public class UserService {
         return userDAO.save(user);
     }
 
+    public void deleteUser(String username){
+        List<User> users=userDAO.findByUsername(username);
+        if (users.size()!=1){
+            throw new IllegalStateException("Not a single user for that username");
+        }
+        User user=users.get(0);
+        userDAO.delete(user);
+    }
+
     public void addauthority(UUID userId, UUID authId) {
         Optional<User> optUser = userDAO.findById(userId);
         Optional<Authority> optAuth = authDAO.findById(authId);

@@ -4,10 +4,7 @@ import io.swagger.annotations.*;
 import org.smither.opwatch.server.auth.JwtTokenProvider;
 import org.smither.opwatch.server.users.Authority;
 import org.smither.opwatch.server.users.UserService;
-import org.smither.opwatch.utils.sharedDTO.AuthReturnDTO;
-import org.smither.opwatch.utils.sharedDTO.CreateAuthDTO;
-import org.smither.opwatch.utils.sharedDTO.RegisterDTO;
-import org.smither.opwatch.utils.sharedDTO.UserReturnDTO;
+import org.smither.opwatch.utils.sharedDTO.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -95,6 +92,22 @@ public class UserController {
     @PostMapping(value = "/user")
     public void register(@RequestBody RegisterDTO registerDTO) {
         userService.createUser(registerDTO.getUsername(), registerDTO.getPassword());
+    }
+
+    @ApiOperation(value = "Deletes an existing user",
+            authorizations = {@Authorization(value = "jwtAuth")}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Never returned but swagger won't let me get rid of it"),
+            @ApiResponse(code = 201, message = "User successfully Deleted"),
+            @ApiResponse(code = 400, message = "Invalid parameters"),
+            @ApiResponse(code = 401, message = "Invalid username / password"),
+            @ApiResponse(code = 409, message = "User exists")
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping(value = "/user")
+    public void delete(@RequestBody UserDeleteDTO userDeleteDTO) {
+        userService.deleteUser(userDeleteDTO.getUsername());
     }
 
     @ApiOperation(value = "Adds an auth to a user",
