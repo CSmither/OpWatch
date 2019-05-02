@@ -36,8 +36,8 @@ jobs:
       - run: ssh gameserv@smither.org "
                 cd ~/games/minecraft/opwatch-develop/docker-compose &&
                 git fetch && git reset --hard origin/develop &&
-                docker-compose -p opwatch_dev kill &&
-                docker-compose -p opwatch_dev rm -f &&
+                docker-compose -p opwatch_dev kill spigot server &&
+                docker-compose -p opwatch_dev rm -f spigot server &&
                 docker-compose pull &&
                 docker-compose -p opwatch_dev up -d "
       - slack/notify:
