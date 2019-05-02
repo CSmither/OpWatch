@@ -8,6 +8,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
@@ -23,6 +24,7 @@ import java.util.logging.Level;
 
 public class RestController {
     public static void sendSignToServer(SignChangeEvent sce) {
+        Bukkit.broadcastMessage("sendSignToServer");
         SignPostDTO dto =
                 new SignPostDTO(
                         sce.getLine(0),
@@ -61,6 +63,7 @@ public class RestController {
     }
 
     public static void sendDto(SignPostDTO dto) {
+        Bukkit.broadcastMessage("sendDto");
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
             postRequest(new URI(Plugin.getInstance().getConfig().getString("serverURL") + "/sign"), body, AuthManager.get().getToken());
@@ -79,6 +82,7 @@ public class RestController {
     }
 
     public static void sendDto(SignEventPostDTO dto) {
+        Bukkit.broadcastMessage("sendDto2");
         try {
             byte[] body = new ObjectMapper().writeValueAsString(dto).getBytes();
             postRequest(new URI(Plugin.getInstance().getConfig().getString("serverUrl") + "/signEvent"), body, AuthManager.get().getToken());
@@ -104,6 +108,7 @@ public class RestController {
     }
 
     private static byte[] postRequest(URI url, byte[] body, String token) {
+        Bukkit.broadcastMessage("postRequest");
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost request = new HttpPost(url);
         request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);

@@ -13,10 +13,10 @@ services:
     ports:
       - "8888:8080"
     depends_on:
-      - database
+      - db
     env_file:
       - "configs/server.env"
-  database:
+  db:
     image: mariadb:10.4.2-bionic
     env_file:
       - "configs/db.env"

@@ -3,6 +3,7 @@ package org.smither.opwatch.spigot;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,7 +33,8 @@ public class Plugin extends JavaPlugin {
 			getLogger().warning(e.getMessage());
 			this.saveDefaultConfig();
 		}
-		this.getServer().getPluginManager().registerEvents(new SignListener(new RestController()), this);
+		getServer().getPluginManager().registerEvents(new SignListener(new RestController()), this);
+		Bukkit.broadcastMessage("OpWatch loaded");
 	}
 
 	@Override
